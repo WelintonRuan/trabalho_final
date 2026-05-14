@@ -327,3 +327,5 @@ def remover_aluno():
             cursor.close()
             conn.close()
 
+    ...
+
