@@ -68,6 +68,7 @@ def login():
             conn.close()
 
 
+
 def menu_adm():
     while True:
         print("\n========= MENU ADM =========")
@@ -325,3 +326,4 @@ def remover_aluno():
         finally:
             cursor.close()
             conn.close()
+
