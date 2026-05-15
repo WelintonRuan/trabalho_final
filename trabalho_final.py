@@ -50,7 +50,7 @@ def login():
                     menu_adm()
 
                 elif cargo == "PROF":
-                    ...
+                    menu_prof()
 
                 elif cargo == "ALUNO":
                     ...
@@ -88,10 +88,28 @@ def menu_adm():
         elif opcao == "0":
             break
 
+        elif opcao == "3":
+            remover_professor()
+
+        elif opcao == "4":
+            remover_aluno()
+
         else:
             print("Opção inválida.")
 
-
+def menu_prof():
+     while True:
+         op = ["0","1","2"]
+         menu = input("\n========= MENU PROF =========\n0 - Sair \n1 - Cadastrar aluno\n2 - Remover aluno\nEscolha: ")
+         if not menu in op:
+             print("Responda com o que está no menu.")
+         elif menu == "1":
+             cadastrar_aluno()
+         elif menu == "2":
+             remover_aluno()
+         else:
+             return None 
+             
 def cadastrar_professor():
     print("\n--- Cadastrar Professor ---")
 
@@ -325,3 +343,5 @@ def remover_aluno():
         finally:
             cursor.close()
             conn.close()
+
+print(login())
