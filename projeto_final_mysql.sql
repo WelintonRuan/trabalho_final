@@ -41,17 +41,26 @@ CREATE TABLE IF NOT EXISTS alunos (
 #TABELA DE NOTAS
 
 
-CREATE TABLE IF NOT EXISTS notas (
+CREATE TABLE notas (
     id INT AUTO_INCREMENT PRIMARY KEY,
+
     aluno_id INT NOT NULL,
-    nota_1trimestre DECIMAL(4,2),
-    nota_2trimestre DECIMAL(4,2),
-    nota_3trimestre DECIMAL(4,2),
+
+    matematica DECIMAL(4,2) DEFAULT 0,
+    portugues DECIMAL(4,2) DEFAULT 0,
+    ciencias DECIMAL(4,2) DEFAULT 0,
+    geografia DECIMAL(4,2) DEFAULT 0,
+    historia DECIMAL(4,2) DEFAULT 0,
+    edf DECIMAL(4,2) DEFAULT 0,
+    artes DECIMAL(4,2) DEFAULT 0,
+    algoritmo DECIMAL(4,2) DEFAULT 0,
+
     media DECIMAL(4,2),
-    situacao VARCHAR(50),
+    situacao VARCHAR(20),
+
     FOREIGN KEY (aluno_id)
     REFERENCES alunos(id)
-        ON DELETE CASCADE
+    ON DELETE CASCADE
 );
 
 
