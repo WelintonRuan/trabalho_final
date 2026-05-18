@@ -137,140 +137,155 @@ def menu_aluno():
 
 
 def cadastrar_professor():
-
-    print("\n--- Cadastrar Professor ---")
-
-    nome = input("Nome do professor: ").strip()
-    materia = input("Matéria: ").strip().lower()
-
-    login_prof = input("Login do professor: ").strip()
-    senha_prof = input("Senha do professor: ").strip()
-
-    if not nome or not materia:
-        return print("Preencha todos os campos.")
-
-    conn = criar_conexao()
-
-    if conn:
-
-        cursor = conn.cursor()
-
+    while True:
         try:
+            print("\n--- Cadastrar Professor ---")
 
-            cursor.execute(
-                """
-                INSERT INTO professores (nome, materia)
-                VALUES (%s, %s)
-                """,
-                (login_prof, materia)
-            )
+            nome = input("Nome do professor: ").strip()
+            materia = input("Matéria: ").strip().lower()
 
-            cursor.execute(
-                """
-                INSERT INTO usuarios (login, senha, cargo)
-                VALUES (%s, %s, %s)
-                """,
-                (login_prof, senha_prof, "PROF")
-            )
+            login_prof = input("Login do professor: ").strip()
+            senha_prof = input("Senha do professor: ").strip()
 
-            conn.commit()
+            if not nome or not materia:
+                print("Preencha todos os campos.")
+                continue
 
-            print("Professor cadastrado com sucesso!")
+            elif not nome.replace(" ","").isalpha:
+                print("Seu nome nao tem como ter números.")
+                continue
+
+            elif len(senha_prof) < 8:
+                print("A senha deve ter no minimo 8 caracteres.")
+                continue
 
         except Error as e:
-            print(f"Erro: {e}")
+            print("Faça o que se pede.")
+            continue
 
-        finally:
-            cursor.close()
-            conn.close()
+        conn = criar_conexao()
+
+        if conn:
+
+            cursor = conn.cursor()
+
+            try:
+
+                cursor.execute(
+                    """
+                    INSERT INTO professores (nome, materia)
+                    VALUES (%s, %s)
+                    """,
+                    (login_prof, materia)
+                )
+
+                cursor.execute(
+                    """
+                    INSERT INTO usuarios (login, senha, cargo)
+                    VALUES (%s, %s, %s)
+                    """,
+                    (login_prof, senha_prof, "PROF")
+                )
+
+                conn.commit()
+
+                print("Professor cadastrado com sucesso!")
+
+            except Error as e:
+                print(f"Erro: {e}")
+
+            finally:
+                cursor.close()
+                conn.close()
 
 
 def cadastrar_aluno():
-
-    print("\n--- Cadastrar Aluno ---")
-
-    nome = input("Nome do aluno: ").strip()
-
-    if not nome:
-        return print("Nome não pode ser vazio.")
-
     while True:
+        print("\n--- Cadastrar Aluno ---")
 
-        try:
+        nome = input("Nome do aluno: ").strip()
 
-            idade = int(input("Idade: "))
+        if not nome:
+            print("Nome não pode ser vazio.")
+            continue
 
-            if idade <= 0:
-                print("Digite uma idade válida.")
-                continue
+        while True:
 
-            break
+            try:
 
-        except ValueError:
-            print("Digite apenas números.")
+                idade = int(input("Idade: "))
 
-    while True:
+                if idade <= 0:
+                    print("Digite uma idade válida.")
+                    continue
 
-        try:
+                break
 
-            turma = int(input("Turma: "))
+            except ValueError:
+                print("Digite apenas números.")
 
-            if turma <= 0:
-                print("Digite uma turma válida.")
-                continue
+        while True:
 
-            break
+            try:
 
-        except ValueError:
-            print("Digite apenas números.")
+                turma = int(input("Turma: "))
 
-    login_aluno = input("Login do aluno: ").strip()
-    senha_aluno = input("Senha do aluno: ").strip()
+                if turma <= 0:
+                    print("Digite uma turma válida.")
+                    continue
 
-    conn = criar_conexao()
+                break
 
-    if conn:
+            except ValueError:
+                print("Digite apenas números.")
 
-        cursor = conn.cursor()
+        login_aluno = input("Login do aluno: ").strip()
+        senha_aluno = input("Senha do aluno: ").strip()
 
-        try:
+        conn = criar_conexao()
 
-            cursor.execute(
-                """
-                INSERT INTO alunos (nome, idade, turma)
-                VALUES (%s, %s, %s)
-                """,
-                (nome, idade, turma)
-            )
+        if conn:
 
-            aluno_id = cursor.lastrowid
+            cursor = conn.cursor()
 
-            cursor.execute(
-                """
-                INSERT INTO usuarios (login, senha, cargo)
-                VALUES (%s, %s, %s)
-                """,
-                (login_aluno, senha_aluno, "ALUNO")
-            )
+            try:
 
-            cursor.execute(
-                """
-                INSERT INTO notas (aluno_id)
-                VALUES (%s)
-                """,
-                (aluno_id,)
-            )
+                cursor.execute(
+                    """
+                    INSERT INTO alunos (nome, idade, turma)
+                    VALUES (%s, %s, %s)
+                    """,
+                    (nome, idade, turma)
+                )
 
-            conn.commit()
+                aluno_id = cursor.lastrowid
 
-            print("Aluno cadastrado com sucesso!")
+                cursor.execute(
+                    """
+                    INSERT INTO usuarios (login, senha, cargo)
+                    VALUES (%s, %s, %s)
+                    """,
+                    (login_aluno, senha_aluno, "ALUNO")
+                )
 
-        except Error as e:
-            print(f"Erro: {e}")
+                cursor.execute(
+                    """
+                    INSERT INTO notas (aluno_id)
+                    VALUES (%s)
+                    """,
+                    (aluno_id,)
+                )
 
-        finally:
-            cursor.close()
-            conn.close()
+                conn.commit()
+
+                print("Aluno cadastrado com sucesso!")
+
+            except Error as e:
+                print(f"Erro: {e}")
+
+            finally:
+                cursor.close()
+                conn.close()
 
 
 def buscar_materia_professor(usuario):
@@ -622,6 +637,4 @@ def remover_aluno():
         finally:
             cursor.close()
             conn.close()
-
-
 login()
