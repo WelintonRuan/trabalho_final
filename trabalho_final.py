@@ -1,6 +1,7 @@
 import mysql.connector
 from mysql.connector import Error
 import os
+global conexao_global
 
 
 def criar_conexao():
@@ -20,10 +21,13 @@ def criar_conexao():
 def login():
     print("\n========= LOGIN =========")
 
+    global conexao_global
+
     usuario = input("Usuário: ")
     senha = input("Senha: ")
 
     conn = criar_conexao()
+    conexao_global = conn
 
     if conn:
 
@@ -65,7 +69,6 @@ def login():
 
         finally:
             cursor.close()
-            conn.close()
 
 
 def menu_adm():
@@ -135,11 +138,11 @@ def menu_prof(usuario):
 def menu_aluno():
     print("Área do aluno em construção.")
 
-def verificar_materia_existente(conexao, materia):
-    
+def verificar_materia_existente(materia):
+    global conexao_global
     cursor = None
     try:
-        cursor = conexao.cursor()
+        cursor = conexao_global.cursor()
         sql = "SELECT id, nome FROM professores WHERE materia = %s"
         cursor.execute(sql, (materia,))
         resultado = cursor.fetchone()
@@ -150,87 +153,72 @@ def verificar_materia_existente(conexao, materia):
         return False
         
     except Error as e:
-        print(f"❌ Erro ao verificar matéria: {e}")
+        print(f"Erro ao verificar matéria: {e}")
         return False
     finally:
         if cursor:
             cursor.close()
 
-def verificar_login_existente(conexao, login):
-    
+def verificar_login_existente(login):
+    global conexao_global
     cursor = None
     try:
-        cursor = conexao.cursor()
-        sql = "SELECT id FROM professores WHERE login = %s"
+        cursor = conexao_global.cursor()
+        sql = "SELECT id FROM usuarios WHERE login = %s"
         cursor.execute(sql, (login,))
         return cursor.fetchone() is not None
         
     except Error as e:
-        print(f"❌ Erro ao verificar login: {e}")
+        print(f"Erro ao verificar login: {e}")
         return False
     finally:
         if cursor:
             cursor.close()
 
-def deletar_professor_por_materia(conexao, materia):
-    
+def deletar_professor_por_materia(materia):
+    global conexao_global
     cursor = None
     try:
-        cursor = conexao.cursor()
-        sql = "DELETE FROM professores WHERE materia = %s"
-        cursor.execute(sql, (materia,))
-        conexao.commit()
-        return True
+        cursor = conexao_global.cursor()
+        cursor.execute("SELECT id FROM professores WHERE materia = %s", (materia,))
+        professor = cursor.fetchone()
+        
+        if professor:
+            professor_id = professor[0]
+
+            cursor.execute("DELETE FROM professores WHERE id = %s", (professor_id,))
+            conexao_global.commit()
+            return True
+        return False
+        
     except Error as e:
-        print(f"❌ Erro ao deletar professor: {e}")
-        conexao.rollback()
+        print(f" Erro ao deletar professor: {e}")
+        conexao_global.rollback()
         return False
     finally:
         if cursor:
             cursor.close()
 
-def inserir_professor(conexao, nome, materia, login, senha):
-    
-    cursor = None
-    try:
-        cursor = conexao.cursor()
-        sql = """
-        INSERT INTO professores (nome, materia, login, senha) 
-        VALUES (%s, %s, %s, %s)
-        """
-        valores = (nome, materia, login, senha)
-        cursor.execute(sql, valores)
-        conexao.commit()
-        return True
-    except Error as e:
-        print(f"❌ Erro ao inserir professor: {e}")
-        conexao.rollback()
-        return False
-    finally:
-        if cursor:
-            cursor.close()
-
-def cadastrar_professor(conexao):  
+def cadastrar_professor():  
+    global conexao_global
     while True:
         try:
             print("\n--- Cadastrar Professor ---")
             
-            
-            mat = ["matematica", "portugues", "ciencia", "geografia", "historia", 
-                   "educacao fisica", "artes", "algoritmo"]
+            materias_validas = ["matematica", "portugues", "ciencia", "geografia", 
+                               "historia", "educacao fisica", "artes", "algoritmo"]
             
             nome = input("Nome do professor: ").strip()
             materia = input("Matéria: ").strip().lower()
             login_prof = input("Login do professor: ").strip()
             senha_prof = input("Senha do professor: ").strip()
             
-            # Validações
             if not nome or not materia or not login_prof or not senha_prof:
                 print(" Preencha todos os campos.")
                 continue
             
-            if materia not in mat:
-                print(f" Matéria inválida. Matérias permitidas: {', '.join(mat)}")
+            if materia not in materias_validas:
+                print(f" Matéria inválida. Matérias permitidas: {', '.join(materias_validas)}")
                 continue
             
             if not nome.replace(" ", "").isalpha():
@@ -242,49 +230,40 @@ def cadastrar_professor(conexao):
                 continue
             
             
-            if verificar_materia_existente(conexao, materia):
+            if verificar_materia_existente(materia):
                 print(f" A matéria '{materia}' já possui um professor cadastrado!")
-                
                 opcao = input("Deseja substituir o professor atual? (s/n): ").strip().lower()
                 if opcao != 's':
                     print("Cadastro cancelado.")
                     continue
                 
-                deletar_professor_por_materia(conexao, materia)
-                print(f"  Professor antigo removido. Cadastrando novo...")
+                deletar_professor_por_materia(materia)
+                print(f" Professor antigo removido. Cadastrando novo...")
             
             
-            if verificar_login_existente(conexao, login_prof):
+            if verificar_login_existente(login_prof):
                 print(" Este login já está em uso. Escolha outro.")
                 continue
             
-            cursor = conexao.cursor()  
+            cursor = conexao_global.cursor()
             
             try:
                 cursor.execute(
-                    """
-                    INSERT INTO professores (nome, materia)
-                    VALUES (%s, %s)
-                    """,
-                    (nome, materia)  
+                    "INSERT INTO professores (nome, materia) VALUES (%s, %s)",
+                    (nome, materia)
                 )
                 
-                
                 cursor.execute(
-                    """
-                    INSERT INTO usuarios (login, senha, cargo)
-                    VALUES (%s, %s, %s)
-                    """,
+                    "INSERT INTO usuarios (login, senha, cargo) VALUES (%s, %s, %s)",
                     (login_prof, senha_prof, "PROF")
                 )
                 
-                conexao.commit() 
-                
+                conexao_global.commit()
                 print(f" Professor {nome} cadastrado com sucesso para a matéria {materia}!")
                 break  
                 
             except Error as e:
-                conexao.rollback()  
+                conexao_global.rollback()
                 print(f" Erro ao inserir no banco: {e}")
                 continue
             finally:
@@ -294,9 +273,8 @@ def cadastrar_professor(conexao):
             print(f" Erro no banco de dados: {e}")
             continue
         except Exception as e:
-            print(f" Erro inesperado: {e}")
+            print(f"Erro inesperado: {e}")
             continue
-
 
 def cadastrar_aluno():
     while True:
