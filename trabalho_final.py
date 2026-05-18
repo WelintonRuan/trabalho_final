@@ -135,50 +135,141 @@ def menu_prof(usuario):
 def menu_aluno():
     print("Área do aluno em construção.")
 
+def verificar_materia_existente(conexao, materia):
+    
+    cursor = None
+    try:
+        cursor = conexao.cursor()
+        sql = "SELECT id, nome FROM professores WHERE materia = %s"
+        cursor.execute(sql, (materia,))
+        resultado = cursor.fetchone()
+        
+        if resultado:
+            print(f"   Professor atual: {resultado[1]} (ID: {resultado[0]})")
+            return True
+        return False
+        
+    except Error as e:
+        print(f"❌ Erro ao verificar matéria: {e}")
+        return False
+    finally:
+        if cursor:
+            cursor.close()
 
-def cadastrar_professor():
+def verificar_login_existente(conexao, login):
+    
+    cursor = None
+    try:
+        cursor = conexao.cursor()
+        sql = "SELECT id FROM professores WHERE login = %s"
+        cursor.execute(sql, (login,))
+        return cursor.fetchone() is not None
+        
+    except Error as e:
+        print(f"❌ Erro ao verificar login: {e}")
+        return False
+    finally:
+        if cursor:
+            cursor.close()
+
+def deletar_professor_por_materia(conexao, materia):
+    
+    cursor = None
+    try:
+        cursor = conexao.cursor()
+        sql = "DELETE FROM professores WHERE materia = %s"
+        cursor.execute(sql, (materia,))
+        conexao.commit()
+        return True
+    except Error as e:
+        print(f"❌ Erro ao deletar professor: {e}")
+        conexao.rollback()
+        return False
+    finally:
+        if cursor:
+            cursor.close()
+
+def inserir_professor(conexao, nome, materia, login, senha):
+    
+    cursor = None
+    try:
+        cursor = conexao.cursor()
+        sql = """
+        INSERT INTO professores (nome, materia, login, senha) 
+        VALUES (%s, %s, %s, %s)
+        """
+        valores = (nome, materia, login, senha)
+        cursor.execute(sql, valores)
+        conexao.commit()
+        return True
+    except Error as e:
+        print(f"❌ Erro ao inserir professor: {e}")
+        conexao.rollback()
+        return False
+    finally:
+        if cursor:
+            cursor.close()
+
+def cadastrar_professor(conexao):  
     while True:
         try:
             print("\n--- Cadastrar Professor ---")
-
+            
+            
+            mat = ["matematica", "portugues", "ciencia", "geografia", "historia", 
+                   "educacao fisica", "artes", "algoritmo"]
+            
             nome = input("Nome do professor: ").strip()
             materia = input("Matéria: ").strip().lower()
-
             login_prof = input("Login do professor: ").strip()
             senha_prof = input("Senha do professor: ").strip()
-
-            if not nome or not materia:
-                print("Preencha todos os campos.")
+            
+            # Validações
+            if not nome or not materia or not login_prof or not senha_prof:
+                print(" Preencha todos os campos.")
                 continue
-
-            elif not nome.replace(" ","").isalpha:
-                print("Seu nome nao tem como ter números.")
+            
+            if materia not in mat:
+                print(f" Matéria inválida. Matérias permitidas: {', '.join(mat)}")
                 continue
-
-            elif len(senha_prof) < 8:
-                print("A senha deve ter no minimo 8 caracteres.")
+            
+            if not nome.replace(" ", "").isalpha():
+                print(" Nome não pode conter números.")
                 continue
-
-        except Error as e:
-            print("Faça o que se pede.")
-            continue
-
-        conn = criar_conexao()
-
-        if conn:
-
-            cursor = conn.cursor()
-
+            
+            if len(senha_prof) < 8:
+                print(" A senha deve ter no mínimo 8 caracteres.")
+                continue
+            
+            
+            if verificar_materia_existente(conexao, materia):
+                print(f" A matéria '{materia}' já possui um professor cadastrado!")
+                
+                opcao = input("Deseja substituir o professor atual? (s/n): ").strip().lower()
+                if opcao != 's':
+                    print("Cadastro cancelado.")
+                    continue
+                
+                deletar_professor_por_materia(conexao, materia)
+                print(f"  Professor antigo removido. Cadastrando novo...")
+            
+            
+            if verificar_login_existente(conexao, login_prof):
+                print(" Este login já está em uso. Escolha outro.")
+                continue
+            
+            cursor = conexao.cursor()  
+            
             try:
-
                 cursor.execute(
                     """
                     INSERT INTO professores (nome, materia)
                     VALUES (%s, %s)
                     """,
-                    (login_prof, materia)
+                    (nome, materia)  
                 )
-
+                
+                
                 cursor.execute(
                     """
                     INSERT INTO usuarios (login, senha, cargo)
@@ -186,17 +277,25 @@ def cadastrar_professor():
                     """,
                     (login_prof, senha_prof, "PROF")
                 )
-
-                conn.commit()
-
-                print("Professor cadastrado com sucesso!")
-
+                
+                conexao.commit() 
+                
+                print(f" Professor {nome} cadastrado com sucesso para a matéria {materia}!")
+                break  
+                
             except Error as e:
-                print(f"Erro: {e}")
-
+                conexao.rollback()  
+                print(f" Erro ao inserir no banco: {e}")
+                continue
             finally:
                 cursor.close()
-                conn.close()
+            
+        except Error as e:
+            print(f" Erro no banco de dados: {e}")
+            continue
+        except Exception as e:
+            print(f" Erro inesperado: {e}")
+            continue
 
 
 def cadastrar_aluno():
