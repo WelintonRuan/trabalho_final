@@ -148,6 +148,9 @@ def menu_aluno():
         if menu == "1":
             ver_nota_matematica()
         
+        elif menu == "2":
+             ver_nota_portugues()
+        
         elif menu =="0":
             return
 
@@ -735,7 +738,7 @@ def ver_nota_matematica():
         cursor = conn.cursor()
         try:
             cursor.execute(
-                "SELECT matematica FROM notas ORDER BY ")
+                "SELECT matematica FROM notas")
 
             notas = cursor.fetchall()
 
@@ -743,7 +746,36 @@ def ver_nota_matematica():
                 print("Nenhum professor cadastrado.")
                 return False
             else:
-                print(f"{'Matematica':<3}")
+                print(f"{'Matematica'}")
+                print("-" * 45)
+
+                for a in notas:
+                    print(f"{a[0]}")
+
+                return True
+
+        except Error as e:
+            print(f"Erro: {e}")
+
+        finally:
+            cursor.close()
+            conn.close()
+
+def ver_nota_portugues():
+    conn = criar_conexao()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "SELECT portugues FROM notas")
+
+            notas = cursor.fetchall()
+
+            if not notas:
+                print("Nenhum professor cadastrado.")
+                return False
+            else:
+                print(f"{'portugues'}")
                 print("-" * 45)
 
                 for a in notas:
