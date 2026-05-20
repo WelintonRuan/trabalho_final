@@ -136,23 +136,22 @@ def menu_prof(usuario):
 
 
 def menu_aluno():
-    print("Área do aluno em construção.")
-
     while True:
+        print("\n========= MENU ALUNO =========")
+        print("1 - Ver notas")
+        print("0 - Sair")
 
-        print("menu")
-        print("1- Ver nota matematica")
+        opcao = input("Escolha: ")
 
-        menu = input("Escolha: ")
+        if opcao == "1":
+            menu_notas()
 
-        if menu == "1":
-            ver_nota_matematica()
-        
-        elif menu == "2":
-             ver_nota_portugues()
-        
-        elif menu =="0":
-            return
+        elif opcao == "0":
+            break
+
+        else:
+            print("Opção inválida.")
+
 
 def verificar_materia_existente(materia):
     global conexao_global
@@ -215,85 +214,85 @@ def deletar_professor_por_materia(materia):
         if cursor:
             cursor.close()
 
-def cadastrar_professor():  
+def cadastrar_professor():
+
     global conexao_global
+
     while True:
-        try:
-            print("\n--- Cadastrar Professor ---")
-            
-            materias_validas = ["matematica", "portugues", "ciencia", "geografia", 
-                               "historia", "educacao fisica", "artes", "algoritmo"]
-            
-            nome = input("Nome do professor: ").strip()
-            materia = input("Matéria: ").strip().lower()
-            login_prof = input("Login do professor: ").strip()
-            senha_prof = input("Senha do professor: ").strip()
-            
-            if not nome or not materia or not login_prof or not senha_prof:
-                print(" Preencha todos os campos.")
-                continue
-            
-            if materia not in materias_validas:
-                print(f" Matéria inválida. Matérias permitidas: {', '.join(materias_validas)}")
-                continue
-            
-            if not nome.replace(" ", "").isalpha():
-                print(" Nome não pode conter números.")
-                continue
-            
-            if len(senha_prof) < 8:
-                print(" A senha deve ter no mínimo 8 caracteres.")
-                continue
-            
-            
-            if verificar_materia_existente(materia):
-                print(f" A matéria '{materia}' já possui um professor cadastrado!")
-                opcao = input("Deseja substituir o professor atual? (s/n): ").strip().lower()
-                if opcao != 's':
-                    print("Cadastro cancelado.")
-                    continue
-                
-                deletar_professor_por_materia(materia)
-                print(f" Professor antigo removido. Cadastrando novo...")
-            
-            
-            if verificar_login_existente(login_prof):
-                print(" Este login já está em uso. Escolha outro.")
-                continue
-            
-            cursor = conexao_global.cursor()
-            
-            try:
-                cursor.execute(
-                    "INSERT INTO professores (nome, materia) VALUES (%s, %s)",
-                    (nome, materia)
-                )
-                
-                cursor.execute(
-                    "INSERT INTO usuarios (login, senha, cargo) VALUES (%s, %s, %s)",
-                    (login_prof, senha_prof, "PROF")
-                )
-                
-                conexao_global.commit()
-                print(f" Professor {nome} cadastrado com sucesso para a matéria {materia}!")
-                break  
-                
-            except Error as e:
-                conexao_global.rollback()
-                print(f" Erro ao inserir no banco: {e}")
-                continue
-            finally:
-                cursor.close()
-            
-        except Error as e:
-            print(f" Erro no banco de dados: {e}")
-            continue
-        except Exception as e:
-            print(f"Erro inesperado: {e}")
+
+        print("\n--- Cadastrar Professor ---")
+
+        materias_validas = [
+            "matematica",
+            "portugues",
+            "ciencias",
+            "geografia",
+            "historia",
+            "educacao fisica",
+            "artes",
+            "algoritmo"
+        ]
+
+        nome = input("Nome do professor: ").strip()
+        materia = input("Matéria: ").strip().lower()
+        login_prof = input("Login do professor: ").strip()
+        senha_prof = input("Senha do professor: ").strip()
+
+        if not nome or not materia or not login_prof or not senha_prof:
+            print("Preencha todos os campos.")
             continue
 
+        if materia not in materias_validas:
+            print("Matéria inválida.")
+            continue
+
+        if verificar_login_existente(login_prof):
+            print("Login já existe.")
+            continue
+
+        conn = criar_conexao()
+
+        if conn:
+
+            cursor = conn.cursor()
+
+            try:
+
+                cursor.execute(
+                    """
+                    INSERT INTO professores (nome, materia, login)
+                    VALUES (%s, %s, %s)
+                    """,
+                    (nome, materia, login_prof)
+                )
+
+                cursor.execute(
+                    """
+                    INSERT INTO usuarios (login, senha, cargo)
+                    VALUES (%s, %s, %s)
+                    """,
+                    (login_prof, senha_prof, "PROF")
+                )
+
+                conn.commit()
+
+                print("Professor cadastrado com sucesso!")
+
+                break
+
+            except Error as e:
+
+                conn.rollback()
+                print(f"Erro: {e}")
+
+            finally:
+                cursor.close()
+                conn.close()
+
 def cadastrar_aluno():
+
     while True:
+
         print("\n--- Cadastrar Aluno ---")
 
         nome = input("Nome do aluno: ").strip()
@@ -345,10 +344,10 @@ def cadastrar_aluno():
 
                 cursor.execute(
                     """
-                    INSERT INTO alunos (nome, idade, turma)
-                    VALUES (%s, %s, %s)
+                    INSERT INTO alunos (nome, idade, turma, login)
+                    VALUES (%s, %s, %s, %s)
                     """,
-                    (nome, idade, turma)
+                    (nome, idade, turma, login_aluno)
                 )
 
                 aluno_id = cursor.lastrowid
@@ -373,13 +372,16 @@ def cadastrar_aluno():
 
                 print("Aluno cadastrado com sucesso!")
 
-            except ValueError as e:
+                return
+
+            except Error as e:
+
+                conn.rollback()
                 print(f"Erro: {e}")
 
             finally:
                 cursor.close()
                 conn.close()
-            return
 
 def buscar_materia_professor(usuario):
 
@@ -395,7 +397,7 @@ def buscar_materia_professor(usuario):
                 """
                 SELECT materia
                 FROM professores
-                WHERE nome = %s
+                WHERE login = %s
                 """,
                 (usuario,)
             )
@@ -404,6 +406,8 @@ def buscar_materia_professor(usuario):
 
             if resultado:
                 return resultado[0]
+
+            return None
 
         except Error as e:
             print(f"Erro: {e}")
@@ -418,7 +422,8 @@ def lancar_nota(usuario):
     materia = buscar_materia_professor(usuario)
 
     if not materia:
-        return print("Matéria do professor não encontrada.")
+        print("Matéria do professor não encontrada.")
+        return
 
     print(f"\n--- Lançar nota de {materia} ---")
 
@@ -464,6 +469,27 @@ def lancar_nota(usuario):
         try:
 
             cursor.execute(
+                """
+                SELECT aluno_id
+                FROM notas
+                WHERE aluno_id = %s
+                """,
+                (id_aluno,)
+            )
+
+            existe = cursor.fetchone()
+
+            if not existe:
+
+                cursor.execute(
+                    """
+                    INSERT INTO notas (aluno_id)
+                    VALUES (%s)
+                    """,
+                    (id_aluno,)
+                )
+
+            cursor.execute(
                 f"""
                 UPDATE notas
                 SET {materia} = %s
@@ -471,6 +497,10 @@ def lancar_nota(usuario):
                 """,
                 (nota, id_aluno)
             )
+
+            if cursor.rowcount == 0:
+                print("Erro ao lançar nota.")
+                return
 
             conn.commit()
 
@@ -485,17 +515,11 @@ def lancar_nota(usuario):
             cursor.close()
             conn.close()
 
-
 def calcular_media(id_aluno):
-
     conn = criar_conexao()
-
     if conn:
-
         cursor = conn.cursor()
-
         try:
-
             cursor.execute(
                 """
                 SELECT matematica,
@@ -508,11 +532,13 @@ def calcular_media(id_aluno):
                        algoritmo
                 FROM notas
                 WHERE aluno_id = %s
-                """,
-                (id_aluno,)
-            )
+                """,(id_aluno,))
 
             notas = cursor.fetchone()
+
+            if notas is None:
+                print("Aluno não possui registro de notas.")
+                return
 
             notas_validas = [n for n in notas if n is not None]
 
@@ -530,9 +556,7 @@ def calcular_media(id_aluno):
                 SET media = %s,
                     situacao = %s
                 WHERE aluno_id = %s
-                """,
-                (media, situacao, id_aluno)
-            )
+                """,(media, situacao, id_aluno))
 
             conn.commit()
 
@@ -546,7 +570,7 @@ def calcular_media(id_aluno):
 
 def remover_professor():
 
-    print("Remover professor")
+    print("\n--- Remover professor ---")
 
     if not listar_professores():
         return
@@ -555,7 +579,7 @@ def remover_professor():
 
         try:
 
-            id_professor = int(input("Id do professor para removelo: "))
+            id_professor = int(input("ID do professor para remover: "))
 
             if id_professor <= 0:
                 print("Digite um ID válido.")
@@ -566,12 +590,11 @@ def remover_professor():
         except ValueError:
             print("Digite apenas números.")
 
-    confirma = input(
-        "Tem certeza? (s/n): "
-    )
+    confirma = input("Tem certeza? (s/n): ")
 
-    if confirma.lower() != 's':
-        return print("Operação cancelada.")
+    if confirma.lower() != "s":
+        print("Operação cancelada.")
+        return
 
     conn = criar_conexao()
 
@@ -582,8 +605,36 @@ def remover_professor():
         try:
 
             cursor.execute(
-                "DELETE FROM professores WHERE id_professor = %s",
+                """
+                SELECT login
+                FROM professores
+                WHERE id = %s
+                """,
                 (id_professor,)
+            )
+
+            professor = cursor.fetchone()
+
+            if not professor:
+                print("Professor não encontrado.")
+                return
+
+            login_prof = professor[0]
+
+            cursor.execute(
+                """
+                DELETE FROM professores
+                WHERE id = %s
+                """,
+                (id_professor,)
+            )
+
+            cursor.execute(
+                """
+                DELETE FROM usuarios
+                WHERE login = %s
+                """,
+                (login_prof,)
             )
 
             conn.commit()
@@ -591,28 +642,21 @@ def remover_professor():
             print("Professor removido com sucesso!")
 
         except Error as e:
+
+            conn.rollback()
             print(f"Erro: {e}")
 
         finally:
             cursor.close()
             conn.close()
 
-
 def listar_professores():
-
     print("\n--- Professores ---")
-
     conn = criar_conexao()
-
     if conn:
-
         cursor = conn.cursor()
-
         try:
-
-            cursor.execute(
-                "SELECT id_professor, nome, materia FROM professores ORDER BY nome"
-            )
+            cursor.execute("SELECT id, nome, materia FROM professores ORDER BY nome")
 
             professores = cursor.fetchall()
 
@@ -639,20 +683,12 @@ def listar_professores():
 
 
 def listar_alunos():
-
     print("\n--- Lista de Alunos ---")
-
     conn = criar_conexao()
-
     if conn:
-
         cursor = conn.cursor()
-
         try:
-
-            cursor.execute(
-                "SELECT id, nome, idade, turma FROM alunos ORDER BY nome"
-            )
+            cursor.execute("SELECT id, nome, idade, turma FROM alunos ORDER BY nome")
 
             alunos = cursor.fetchall()
 
@@ -680,7 +716,7 @@ def listar_alunos():
 
 def remover_aluno():
 
-    print("Remover aluno")
+    print("\n--- Remover aluno ---")
 
     if not listar_alunos():
         return
@@ -689,7 +725,7 @@ def remover_aluno():
 
         try:
 
-            id_aluno = int(input("Id do aluno para removelo: "))
+            id_aluno = int(input("ID do aluno para remover: "))
 
             if id_aluno <= 0:
                 print("Digite um ID válido.")
@@ -700,12 +736,11 @@ def remover_aluno():
         except ValueError:
             print("Digite apenas números.")
 
-    confirma = input(
-        "Tem certeza? (s/n): "
-    )
+    confirma = input("Tem certeza? (s/n): ")
 
-    if confirma.lower() != 's':
-        return print("Operação cancelada.")
+    if confirma.lower() != "s":
+        print("Operação cancelada.")
+        return
 
     conn = criar_conexao()
 
@@ -716,8 +751,44 @@ def remover_aluno():
         try:
 
             cursor.execute(
-                "DELETE FROM alunos WHERE id = %s",
+                """
+                SELECT login
+                FROM alunos
+                WHERE id = %s
+                """,
                 (id_aluno,)
+            )
+
+            aluno = cursor.fetchone()
+
+            if not aluno:
+                print("Aluno não encontrado.")
+                return
+
+            login_aluno = aluno[0]
+
+            cursor.execute(
+                """
+                DELETE FROM notas
+                WHERE aluno_id = %s
+                """,
+                (id_aluno,)
+            )
+
+            cursor.execute(
+                """
+                DELETE FROM alunos
+                WHERE id = %s
+                """,
+                (id_aluno,)
+            )
+
+            cursor.execute(
+                """
+                DELETE FROM usuarios
+                WHERE login = %s
+                """,
+                (login_aluno,)
             )
 
             conn.commit()
@@ -725,34 +796,39 @@ def remover_aluno():
             print("Aluno removido com sucesso!")
 
         except Error as e:
+
+            conn.rollback()
             print(f"Erro: {e}")
 
         finally:
             cursor.close()
             conn.close()
 
-
-def ver_nota_matematica():
+def ver_nota(materia):
     conn = criar_conexao()
     if conn:
         cursor = conn.cursor()
         try:
-            cursor.execute(
-                "SELECT matematica FROM notas")
+
+            sql = f"""
+            SELECT aluno_id, {materia}
+            FROM notas
+            """
+
+            cursor.execute(sql)
 
             notas = cursor.fetchall()
 
             if not notas:
-                print("Nenhum professor cadastrado.")
-                return False
-            else:
-                print(f"{'Matematica'}")
-                print("-" * 45)
+                print("Nenhuma nota encontrada.")
+                return
 
-                for a in notas:
-                    print(f"{a[0]}")
+            print(f"\n--- Nota de {materia} ---")
+            print(f"{'Aluno ID':<10} {'Nota'}")
+            print("-" * 20)
 
-                return True
+            for nota in notas:
+                print(f"{nota[0]:<10} {nota[1]}")
 
         except Error as e:
             print(f"Erro: {e}")
@@ -761,32 +837,48 @@ def ver_nota_matematica():
             cursor.close()
             conn.close()
 
-def ver_nota_portugues():
-    conn = criar_conexao()
-    if conn:
-        cursor = conn.cursor()
-        try:
-            cursor.execute(
-                "SELECT portugues FROM notas")
+def menu_notas():
+    while True:
+        print("\n========= NOTAS =========")
+        print("1 - Matemática")
+        print("2 - Português")
+        print("3 - Ciências")
+        print("4 - Geografia")
+        print("5 - História")
+        print("6 - Educação Física")
+        print("7 - Artes")
+        print("8 - Algoritmo")
+        print("0 - Voltar")
 
-            notas = cursor.fetchall()
+        opcao = input("Escolha a matéria: ")
 
-            if not notas:
-                print("Nenhum professor cadastrado.")
-                return False
-            else:
-                print(f"{'portugues'}")
-                print("-" * 45)
+        if opcao == "1":
+            ver_nota("matematica")
 
-                for a in notas:
-                    print(f"{a[0]}")
+        elif opcao == "2":
+            ver_nota("portugues")
 
-                return True
+        elif opcao == "3":
+            ver_nota("ciencias")
 
-        except Error as e:
-            print(f"Erro: {e}")
+        elif opcao == "4":
+            ver_nota("geografia")
 
-        finally:
-            cursor.close()
-            conn.close()
+        elif opcao == "5":
+            ver_nota("historia")
+
+        elif opcao == "6":
+            ver_nota("edf")
+
+        elif opcao == "7":
+            ver_nota("artes")
+
+        elif opcao == "8":
+            ver_nota("algoritmo")
+
+        elif opcao == "0":
+            break
+
+        else:
+            print("Opção inválida.")
 login()
