@@ -19,10 +19,13 @@ CREATE TABLE IF NOT EXISTS usuarios (
 #TABELA DE PROFESSORES
 
 
-CREATE TABLE IF NOT EXISTS professores (
+DROP TABLE IF EXISTS professores;
+
+CREATE TABLE professores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
-    materia VARCHAR(100)
+    materia VARCHAR(100),
+    login VARCHAR(50)
 );
 
 
@@ -33,7 +36,8 @@ CREATE TABLE IF NOT EXISTS alunos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     idade INT,
-    turma INT
+    turma INT,
+    login VARCHAR(50)
 );
 
 
@@ -44,7 +48,7 @@ CREATE TABLE IF NOT EXISTS alunos (
 CREATE TABLE notas (
     id INT AUTO_INCREMENT PRIMARY KEY,
 
-    aluno_id INT NOT NULL,
+    aluno_id INT NOT NULL UNIQUE,
 
     matematica DECIMAL(4,2) DEFAULT 0,
     portugues DECIMAL(4,2) DEFAULT 0,
@@ -63,10 +67,8 @@ CREATE TABLE notas (
     ON DELETE CASCADE
 );
 
-
 #LOGIN DO ADM
 INSERT INTO usuarios (login, senha, cargo)
 VALUES ('admin', '123', 'ADM');
-
 
 
