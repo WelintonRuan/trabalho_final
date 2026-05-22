@@ -248,3 +248,84 @@ def deletar_professor_por_materia(materia):
     finally:
         if cursor:
             cursor.close()
+
+
+def alterar_nome_professor():
+    listar_professores()
+
+    conn = criar_conexao()
+    if conn:
+        cursor = conn.cursor()
+
+        try:
+            professor_id = int(input("ID do professor: "))
+
+            cursor.execute(
+                "SELECT id FROM professores WHERE id = %s",
+                (professor_id,)
+            )
+
+            if cursor.fetchone() is None:
+                print("professor não encontrado.")
+                return
+
+            novo_nome = input("Novo nome: ")
+
+            cursor.execute(
+                """
+                UPDATE professores
+                SET nome = %s
+                WHERE id = %s
+                """,
+                (novo_nome, professor_id)
+            )
+
+            conn.commit()
+            print("Nome alterado com sucesso!")
+
+        except Exception as e:
+            print(f"Erro: {e}")
+
+        finally:
+            cursor.close()
+            conn.close()
+
+def alterar_materia_professor():
+    listar_professores()
+
+    conn = criar_conexao()
+    if conn:
+        cursor = conn.cursor()
+
+        try:
+            professor_id = int(input("ID do professor: "))
+
+            cursor.execute(
+                "SELECT id FROM professores WHERE id = %s",
+                (professor_id,)
+            )
+
+            if cursor.fetchone() is None:
+                print("professor não encontrado.")
+                return
+
+            nova_materia = input("Nova materia: ")
+
+            cursor.execute(
+                """
+                UPDATE professores
+                SET materia = %s
+                WHERE id = %s
+                """,
+                (nova_materia, professor_id)
+            )
+
+            conn.commit()
+            print("materia alterado com sucesso!")
+
+        except Exception as e:
+            print(f"Erro: {e}")
+
+        finally:
+            cursor.close()
+            conn.close()

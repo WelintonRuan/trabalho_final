@@ -37,3 +37,5 @@ def verificar_login_existente(login):
     finally:
         if cursor:
             cursor.close()
+
+

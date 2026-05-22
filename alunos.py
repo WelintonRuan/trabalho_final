@@ -217,3 +217,83 @@ def remover_aluno():
         finally:
             cursor.close()
             conn.close()
+
+def alterar_turma_aluno():
+    listar_alunos()
+
+    conn = criar_conexao()
+    if conn:
+        cursor = conn.cursor()
+
+        try:
+            aluno_id = int(input("ID do aluno: "))
+
+            cursor.execute(
+                "SELECT id FROM alunos WHERE id = %s",
+                (aluno_id,)
+            )
+
+            if cursor.fetchone() is None:
+                print("Aluno não encontrado.")
+                return
+
+            nova_turma = int(input("Nova turma: "))
+
+            cursor.execute(
+                """
+                UPDATE alunos
+                SET turma = %s
+                WHERE id = %s
+                """,
+                (nova_turma, aluno_id)
+            )
+
+            conn.commit()
+            print("Turma alterada com sucesso!")
+
+        except Exception as e:
+            print(f"Erro: {e}")
+
+        finally:
+            cursor.close()
+            conn.close()
+
+def alterar_nome_aluno():
+    listar_alunos()
+
+    conn = criar_conexao()
+    if conn:
+        cursor = conn.cursor()
+
+        try:
+            aluno_id = int(input("ID do aluno: "))
+
+            cursor.execute(
+                "SELECT id FROM alunos WHERE id = %s",
+                (aluno_id,)
+            )
+
+            if cursor.fetchone() is None:
+                print("Aluno não encontrado.")
+                return
+
+            novo_nome = input("Novo nome: ")
+
+            cursor.execute(
+                """
+                UPDATE alunos
+                SET nome = %s
+                WHERE id = %s
+                """,
+                (novo_nome, aluno_id)
+            )
+
+            conn.commit()
+            print("Nome alterado com sucesso!")
+
+        except Exception as e:
+            print(f"Erro: {e}")
+
+        finally:
+            cursor.close()
+            conn.close()
