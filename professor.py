@@ -1,16 +1,28 @@
-from binascii import Error
+from mysql.connector import Error
 
 from database import criar_conexao
 from utils import verificar_login_existente
 
 
 def listar_professores():
+
     print("\n--- Professores ---")
+
     conn = criar_conexao()
+
     if conn:
+
         cursor = conn.cursor()
+
         try:
-            cursor.execute("SELECT id, nome, materia FROM professores ORDER BY nome")
+
+            cursor.execute(
+                """
+                SELECT id, nome, materia
+                FROM professores
+                ORDER BY nome
+                """
+            )
 
             professores = cursor.fetchall()
 
@@ -18,22 +30,28 @@ def listar_professores():
                 print("Nenhum professor cadastrado.")
                 return False
 
-            else:
+            print(f"{'ID':<5}{'Nome':<20}{'Matéria'}")
+            print("-" * 45)
 
-                print(f"{'ID':<3} {'Nome':<15} {'Materia'}")
-                print("-" * 45)
+            for professor in professores:
+                print(
+                    f"{professor[0]:<5}"
+                    f"{professor[1]:<20}"
+                    f"{professor[2]}"
+                )
 
-                for a in professores:
-                    print(f"{a[0]:<3} {a[1]:<15} {a[2]}")
-
-                return True
+            return True
 
         except Error as e:
+
             print(f"Erro: {e}")
+            return False
 
         finally:
+
             cursor.close()
             conn.close()
+
 
 def remover_professor():
 
@@ -57,9 +75,9 @@ def remover_professor():
         except ValueError:
             print("Digite apenas números.")
 
-    confirma = input("Tem certeza? (s/n): ")
+    confirma = input("Tem certeza? (s/n): ").strip().lower()
 
-    if confirma.lower() != "s":
+    if confirma != "s":
         print("Operação cancelada.")
         return
 
@@ -114,8 +132,10 @@ def remover_professor():
             print(f"Erro: {e}")
 
         finally:
+
             cursor.close()
             conn.close()
+
 
 def buscar_materia_professor(usuario):
 
@@ -144,30 +164,32 @@ def buscar_materia_professor(usuario):
             return None
 
         except Error as e:
+
             print(f"Erro: {e}")
+            return None
 
         finally:
+
             cursor.close()
             conn.close()
 
+
 def cadastrar_professor():
 
-    global conexao_global
+    materias_validas = [
+        "matematica",
+        "portugues",
+        "ciencias",
+        "geografia",
+        "historia",
+        "edf",
+        "artes",
+        "algoritmo"
+    ]
 
     while True:
 
         print("\n--- Cadastrar Professor ---")
-
-        materias_validas = [
-            "matematica",
-            "portugues",
-            "ciencias",
-            "geografia",
-            "historia",
-            "educacao fisica",
-            "artes",
-            "algoritmo"
-        ]
 
         nome = input("Nome do professor: ").strip()
         materia = input("Matéria: ").strip().lower()
@@ -213,8 +235,7 @@ def cadastrar_professor():
                 conn.commit()
 
                 print("Professor cadastrado com sucesso!")
-
-                break
+                return
 
             except Error as e:
 
@@ -222,54 +243,95 @@ def cadastrar_professor():
                 print(f"Erro: {e}")
 
             finally:
+
                 cursor.close()
                 conn.close()
 
-def deletar_professor_por_materia(materia):
-    global conexao_global
-    cursor = None
-    try:
-        cursor = conexao_global.cursor()
-        cursor.execute("SELECT id FROM professores WHERE materia = %s", (materia,))
-        professor = cursor.fetchone()
-        
-        if professor:
-            professor_id = professor[0]
 
-            cursor.execute("DELETE FROM professores WHERE id = %s", (professor_id,))
-            conexao_global.commit()
-            return True
+def deletar_professor_por_materia(materia):
+
+    conn = criar_conexao()
+
+    if not conn:
         return False
-        
+
+    cursor = conn.cursor()
+
+    try:
+
+        cursor.execute(
+            """
+            SELECT id
+            FROM professores
+            WHERE materia = %s
+            """,
+            (materia,)
+        )
+
+        professor = cursor.fetchone()
+
+        if not professor:
+            return False
+
+        professor_id = professor[0]
+
+        cursor.execute(
+            """
+            DELETE FROM professores
+            WHERE id = %s
+            """,
+            (professor_id,)
+        )
+
+        conn.commit()
+
+        return True
+
     except Error as e:
-        print(f" Erro ao deletar professor: {e}")
-        conexao_global.rollback()
+
+        print(f"Erro ao deletar professor: {e}")
+        conn.rollback()
         return False
+
     finally:
-        if cursor:
-            cursor.close()
+
+        cursor.close()
+        conn.close()
 
 
 def alterar_nome_professor():
-    listar_professores()
+
+    if not listar_professores():
+        return
 
     conn = criar_conexao()
+
     if conn:
+
         cursor = conn.cursor()
 
         try:
+
             professor_id = int(input("ID do professor: "))
 
             cursor.execute(
-                "SELECT id FROM professores WHERE id = %s",
+                """
+                SELECT id
+                FROM professores
+                WHERE id = %s
+                """,
                 (professor_id,)
             )
 
             if cursor.fetchone() is None:
-                print("professor não encontrado.")
+                print("Professor não encontrado.")
                 return
 
-            novo_nome = input("Novo nome: ")
+            novo_nome = input("Novo nome: ").strip()
+
+            if not novo_nome:
+                print("Nome inválido.")
+                return
 
             cursor.execute(
                 """
@@ -281,35 +343,67 @@ def alterar_nome_professor():
             )
 
             conn.commit()
+
             print("Nome alterado com sucesso!")
 
-        except Exception as e:
+        except ValueError:
+
+            print("Digite apenas números.")
+
+        except Error as e:
+
             print(f"Erro: {e}")
 
         finally:
+
             cursor.close()
             conn.close()
 
+
 def alterar_materia_professor():
-    listar_professores()
+
+    if not listar_professores():
+        return
+
+    materias_validas = [
+        "matematica",
+        "portugues",
+        "ciencias",
+        "geografia",
+        "historia",
+        "edf",
+        "artes",
+        "algoritmo"
+    ]
 
     conn = criar_conexao()
+
     if conn:
+
         cursor = conn.cursor()
 
         try:
+
             professor_id = int(input("ID do professor: "))
 
             cursor.execute(
-                "SELECT id FROM professores WHERE id = %s",
+                """
+                SELECT id
+                FROM professores
+                WHERE id = %s
+                """,
                 (professor_id,)
             )
 
             if cursor.fetchone() is None:
-                print("professor não encontrado.")
+                print("Professor não encontrado.")
                 return
 
-            nova_materia = input("Nova materia: ")
+            nova_materia = input("Nova matéria: ").strip().lower()
+
+            if nova_materia not in materias_validas:
+                print("Matéria inválida.")
+                return
 
             cursor.execute(
                 """
@@ -321,11 +415,18 @@ def alterar_materia_professor():
             )
 
             conn.commit()
-            print("materia alterado com sucesso!")
 
-        except Exception as e:
+            print("Matéria alterada com sucesso!")
+
+        except ValueError:
+
+            print("Digite apenas números.")
+
+        except Error as e:
+
             print(f"Erro: {e}")
 
         finally:
+
             cursor.close()
             conn.close()

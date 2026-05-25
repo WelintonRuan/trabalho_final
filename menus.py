@@ -1,62 +1,101 @@
-from binascii import Error
+from mysql.connector import Error
 
-from alunos import alterar_nome_aluno, alterar_turma_aluno, cadastrar_aluno, listar_alunos,remover_aluno
+from alunos import (
+    cadastrar_aluno,
+    listar_alunos,
+    remover_aluno,
+    alterar_turma_aluno,
+    alterar_nome_aluno
+)
+
+from professor import (
+    cadastrar_professor,
+    listar_professores,
+    remover_professor,
+    alterar_materia_professor,
+    alterar_nome_professor
+)
+
+from notas import lancar_nota, ver_nota
 from database import criar_conexao
-from professor import alterar_materia_professor, alterar_nome_professor, cadastrar_professor,listar_professores,remover_professor
-from notas import lancar_nota,ver_nota
+
 
 def login():
-    print("\n========= LOGIN =========")
 
-    global conexao_global
+    print("\n========= LOGIN =========")
 
     usuario = input("Usuário: ")
     senha = input("Senha: ")
 
     conn = criar_conexao()
-    conexao_global = conn
 
-    if conn:
+    if not conn:
+        return
 
-        cursor = conn.cursor()
+    cursor = conn.cursor()
 
-        try:
+    try:
 
-            cursor.execute(
-                """
-                SELECT cargo
-                FROM usuarios
-                WHERE login = %s AND senha = %s
-                """,
-                (usuario, senha)
-            )
+        cursor.execute(
+            """
+            SELECT cargo
+            FROM usuarios
+            WHERE login = %s AND senha = %s
+            """,
+            (usuario, senha)
+        )
 
-            resultado = cursor.fetchone()
+        resultado = cursor.fetchone()
 
-            if resultado:
+        if not resultado:
+            print("Usuário ou senha incorretos.")
+            return
 
-                cargo = resultado[0]
+        cargo = resultado[0]
 
-                print("\nLogin realizado com sucesso!")
+        print("\nLogin realizado com sucesso!")
 
-                if cargo == "ADM":
-                    menu_adm()
+        if cargo == "ADM":
+            menu_adm()
 
-                elif cargo == "PROF":
-                    menu_prof(usuario)
+        elif cargo == "PROF":
+            menu_prof(usuario)
 
-                elif cargo == "ALUNO":
-                    menu_aluno()
+        elif cargo == "ALUNO":
+            menu_aluno(usuario)
 
-            else:
-                print("Usuário ou senha incorretos.")
-                menu_login()
+    except Error as e:
 
-        except Error as e:
-            print(f"Erro: {e}")
+        print(f"Erro: {e}")
 
-        finally:
-            cursor.close()
+    finally:
+
+        cursor.close()
+        conn.close()
+
+
+def menu_login():
+
+    while True:
+
+        print("\n========= SISTEMA ESCOLAR =========")
+        print("1 - Logar")
+        print("0 - Sair")
+
+        opcao = input("Escolha: ")
+
+        if opcao == "1":
+
+            login()
+
+        elif opcao == "0":
+
+            print("Sistema encerrado.")
+            break
+
+        else:
+
+            print("Escolha uma opção válida.")
 
 
 def menu_adm():
@@ -64,68 +103,84 @@ def menu_adm():
     while True:
 
         print("\n========= MENU ADM =========")
-        print("1 - Administrar professor")
-        print("2 - Administrar aluno")
-        print("0 - Sair")
+        print("1 - Administrar professores")
+        print("2 - Administrar alunos")
+        print("0 - Logout")
 
         opcao = input("Escolha: ")
 
         if opcao == "1":
+
             menu_administrar_professor()
 
         elif opcao == "2":
+
             menu_administrar_alunos()
-       
 
         elif opcao == "0":
-            menu_login()
+
+            break
 
         else:
+
             print("Opção inválida.")
+
 
 def menu_prof(usuario):
 
     while True:
 
-        print("\n========= MENU PROF =========")
+        print("\n========= MENU PROFESSOR =========")
         print("1 - Lançar nota")
-        print("2 - Ver alunos")
-        print("0 - Sair")
-
-        menu = input("Escolha: ")
-
-        if menu == "1":
-            lancar_nota(usuario)
-
-        elif menu == "2":
-            listar_alunos()
-
-        elif menu == "0":
-            menu_login()
-
-        else:
-            print("Opção inválida.")
-
-
-def menu_aluno():
-    while True:
-        print("\n========= MENU ALUNO =========")
-        print("1 - Ver notas")
-        print("0 - Sair")
+        print("2 - Listar alunos")
+        print("0 - Logout")
 
         opcao = input("Escolha: ")
 
         if opcao == "1":
-            menu_notas()
+
+            lancar_nota(usuario)
+
+        elif opcao == "2":
+
+            listar_alunos()
 
         elif opcao == "0":
-            menu_login()
+
+            break
 
         else:
+
             print("Opção inválida.")
 
-def menu_notas():
+
+def menu_aluno(usuario):
+
     while True:
+
+        print("\n========= MENU ALUNO =========")
+        print("1 - Ver notas")
+        print("0 - Logout")
+
+        opcao = input("Escolha: ")
+
+        if opcao == "1":
+
+            menu_notas(usuario)
+
+        elif opcao == "0":
+
+            break
+
+        else:
+
+            print("Opção inválida.")
+
+
+def menu_notas(usuario):
+
+    while True:
+
         print("\n========= NOTAS =========")
         print("1 - Matemática")
         print("2 - Português")
@@ -140,114 +195,127 @@ def menu_notas():
         opcao = input("Escolha a matéria: ")
 
         if opcao == "1":
-            ver_nota("matematica")
+
+            ver_nota(usuario, "matematica")
 
         elif opcao == "2":
-            ver_nota("portugues")
+
+            ver_nota(usuario, "portugues")
 
         elif opcao == "3":
-            ver_nota("ciencias")
+
+            ver_nota(usuario, "ciencias")
 
         elif opcao == "4":
-            ver_nota("geografia")
+
+            ver_nota(usuario, "geografia")
 
         elif opcao == "5":
-            ver_nota("historia")
+
+            ver_nota(usuario, "historia")
 
         elif opcao == "6":
-            ver_nota("edf")
+
+            ver_nota(usuario, "edf")
 
         elif opcao == "7":
-            ver_nota("artes")
+
+            ver_nota(usuario, "artes")
 
         elif opcao == "8":
-            ver_nota("algoritmo")
+
+            ver_nota(usuario, "algoritmo")
 
         elif opcao == "0":
+
             break
 
         else:
+
             print("Opção inválida.")
-
-def menu_login():
-    print("1- logar")
-    print("0- Sair")
-
-    opcao = input("Escolha: ")
-
-    if opcao == "1":
-        login()
-
-    elif opcao == "0":
-        exit()
-    
-    else:
-        print("Escolha uma opçao valida")
-        menu_login()
 
 
 def menu_administrar_professor():
-    print("1 - Cadastrar professor")
-    print("2 - Remover professor")
-    print("3 - Listar professor")
-    print("4 - Mudar materia")
-    print("5 - Mudar nome")
-    print("0 - Sair")
 
-    opcao = input("Escolha: ")
+    while True:
 
-    if opcao == "1":
-        cadastrar_professor()
-    
-    elif opcao == "2":
-        remover_professor()
-    
-    elif opcao == "3":
-        listar_professores()
-    
-    elif opcao == "4":
-        alterar_materia_professor()
-        
-    
-    elif opcao == "5":
-        alterar_nome_professor()
-    
-    elif opcao == "0":
-        return
-    
-    else:
-        print("Escolha uma opçao valida")
-        menu_administrar_professor()
+        print("\n===== ADMINISTRAR PROFESSORES =====")
+        print("1 - Cadastrar professor")
+        print("2 - Remover professor")
+        print("3 - Listar professores")
+        print("4 - Alterar matéria")
+        print("5 - Alterar nome")
+        print("0 - Voltar")
+
+        opcao = input("Escolha: ")
+
+        if opcao == "1":
+
+            cadastrar_professor()
+
+        elif opcao == "2":
+
+            remover_professor()
+
+        elif opcao == "3":
+
+            listar_professores()
+
+        elif opcao == "4":
+
+            alterar_materia_professor()
+
+        elif opcao == "5":
+
+            alterar_nome_professor()
+
+        elif opcao == "0":
+
+            break
+
+        else:
+
+            print("Opção inválida.")
 
 
 def menu_administrar_alunos():
-    print("1 - Cadastrar alunos")
-    print("2 - Remover alunos")
-    print("3 - Listar alunos")
-    print("4 - Mudar turma dos alunos")
-    print("5 - Mudar nome dos alunos")
-    print("0 - Sair")
 
-    opcao = input("Escolha: ")
+    while True:
 
-    if opcao == "1":
-        cadastrar_aluno()
-    
-    elif opcao == "2":
-        remover_aluno()
-    
-    elif opcao == "3":
-        listar_alunos()
-    
-    elif opcao == "4":
-        alterar_turma_aluno()
-    
-    elif opcao == "5":
-        alterar_nome_aluno()
-        
-    elif opcao == "0":
-        return
+        print("\n===== ADMINISTRAR ALUNOS =====")
+        print("1 - Cadastrar aluno")
+        print("2 - Remover aluno")
+        print("3 - Listar alunos")
+        print("4 - Alterar turma")
+        print("5 - Alterar nome")
+        print("0 - Voltar")
 
-    else:
-        print("Escolha uma opçao valida")
-        menu_administrar_alunos()
+        opcao = input("Escolha: ")
+
+        if opcao == "1":
+
+            cadastrar_aluno()
+
+        elif opcao == "2":
+
+            remover_aluno()
+
+        elif opcao == "3":
+
+            listar_alunos()
+
+        elif opcao == "4":
+
+            alterar_turma_aluno()
+
+        elif opcao == "5":
+
+            alterar_nome_aluno()
+
+        elif opcao == "0":
+
+            break
+
+        else:
+
+            print("Opção inválida.")

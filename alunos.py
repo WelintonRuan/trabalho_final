@@ -1,6 +1,7 @@
-from binascii import Error
+from mysql.connector import Error
 
 from database import criar_conexao
+from utils import verificar_login_existente
 
 
 def cadastrar_aluno():
@@ -46,7 +47,16 @@ def cadastrar_aluno():
                 print("Digite apenas números.")
 
         login_aluno = input("Login do aluno: ").strip()
+
+        if verificar_login_existente(login_aluno):
+            print("Login já existe.")
+            continue
+
         senha_aluno = input("Senha do aluno: ").strip()
+
+        if not senha_aluno:
+            print("Senha não pode ser vazia.")
+            continue
 
         conn = criar_conexao()
 
@@ -85,7 +95,6 @@ def cadastrar_aluno():
                 conn.commit()
 
                 print("Aluno cadastrado com sucesso!")
-
                 return
 
             except Error as e:
@@ -94,16 +103,30 @@ def cadastrar_aluno():
                 print(f"Erro: {e}")
 
             finally:
+
                 cursor.close()
                 conn.close()
 
+
 def listar_alunos():
+
     print("\n--- Lista de Alunos ---")
+
     conn = criar_conexao()
+
     if conn:
+
         cursor = conn.cursor()
+
         try:
-            cursor.execute("SELECT id, nome, idade, turma FROM alunos ORDER BY nome")
+
+            cursor.execute(
+                """
+                SELECT id, nome, idade, turma
+                FROM alunos
+                ORDER BY nome
+                """
+            )
 
             alunos = cursor.fetchall()
 
@@ -111,22 +134,29 @@ def listar_alunos():
                 print("Nenhum aluno cadastrado.")
                 return False
 
-            else:
+            print(f"{'ID':<5}{'Nome':<20}{'Idade':<10}{'Turma'}")
+            print("-" * 45)
 
-                print(f"{'ID':<3} {'Nome':<15} {'Idade':<6} {'Turma'}")
-                print("-" * 45)
+            for aluno in alunos:
+                print(
+                    f"{aluno[0]:<5}"
+                    f"{aluno[1]:<20}"
+                    f"{aluno[2]:<10}"
+                    f"{aluno[3]}"
+                )
 
-                for a in alunos:
-                    print(f"{a[0]:<3} {a[1]:<15} {a[2]:<6} {a[3]}")
-
-                return True
+            return True
 
         except Error as e:
+
             print(f"Erro: {e}")
+            return False
 
         finally:
+
             cursor.close()
             conn.close()
+
 
 def remover_aluno():
 
@@ -150,9 +180,9 @@ def remover_aluno():
         except ValueError:
             print("Digite apenas números.")
 
-    confirma = input("Tem certeza? (s/n): ")
+    confirma = input("Tem certeza? (s/n): ").lower()
 
-    if confirma.lower() != "s":
+    if confirma != "s":
         print("Operação cancelada.")
         return
 
@@ -215,21 +245,32 @@ def remover_aluno():
             print(f"Erro: {e}")
 
         finally:
+
             cursor.close()
             conn.close()
 
+
 def alterar_turma_aluno():
-    listar_alunos()
+
+    if not listar_alunos():
+        return
 
     conn = criar_conexao()
+
     if conn:
+
         cursor = conn.cursor()
 
         try:
+
             aluno_id = int(input("ID do aluno: "))
 
             cursor.execute(
-                "SELECT id FROM alunos WHERE id = %s",
+                """
+                SELECT id
+                FROM alunos
+                WHERE id = %s
+                """,
                 (aluno_id,)
             )
 
@@ -237,7 +278,20 @@ def alterar_turma_aluno():
                 print("Aluno não encontrado.")
                 return
 
-            nova_turma = int(input("Nova turma: "))
+            while True:
+
+                try:
+
+                    nova_turma = int(input("Nova turma: "))
+
+                    if nova_turma <= 0:
+                        print("Digite uma turma válida.")
+                        continue
+
+                    break
+
+                except ValueError:
+                    print("Digite apenas números.")
 
             cursor.execute(
                 """
@@ -249,27 +303,44 @@ def alterar_turma_aluno():
             )
 
             conn.commit()
+
             print("Turma alterada com sucesso!")
 
-        except Exception as e:
+        except ValueError:
+
+            print("Digite apenas números.")
+
+        except Error as e:
+
             print(f"Erro: {e}")
 
         finally:
+
             cursor.close()
             conn.close()
 
+
 def alterar_nome_aluno():
-    listar_alunos()
+
+    if not listar_alunos():
+        return
 
     conn = criar_conexao()
+
     if conn:
+
         cursor = conn.cursor()
 
         try:
+
             aluno_id = int(input("ID do aluno: "))
 
             cursor.execute(
-                "SELECT id FROM alunos WHERE id = %s",
+                """
+                SELECT id
+                FROM alunos
+                WHERE id = %s
+                """,
                 (aluno_id,)
             )
 
@@ -277,7 +348,11 @@ def alterar_nome_aluno():
                 print("Aluno não encontrado.")
                 return
 
-            novo_nome = input("Novo nome: ")
+            novo_nome = input("Novo nome: ").strip()
+
+            if not novo_nome:
+                print("Nome inválido.")
+                return
 
             cursor.execute(
                 """
@@ -289,11 +364,18 @@ def alterar_nome_aluno():
             )
 
             conn.commit()
+
             print("Nome alterado com sucesso!")
 
-        except Exception as e:
+        except ValueError:
+
+            print("Digite apenas números.")
+
+        except Error as e:
+
             print(f"Erro: {e}")
 
         finally:
+
             cursor.close()
             conn.close()

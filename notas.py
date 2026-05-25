@@ -1,9 +1,8 @@
-from binascii import Error
+from mysql.connector import Error
 
 from alunos import listar_alunos
 from database import criar_conexao
 from professor import buscar_materia_professor
-
 
 
 def lancar_nota(usuario):
@@ -41,7 +40,7 @@ def lancar_nota(usuario):
             nota = float(input(f"Nota de {materia}: "))
 
             if nota < 0 or nota > 10:
-                print("Digite nota entre 0 e 10.")
+                print("Digite uma nota entre 0 e 10.")
                 continue
 
             break
@@ -59,24 +58,16 @@ def lancar_nota(usuario):
 
             cursor.execute(
                 """
-                SELECT aluno_id
-                FROM notas
-                WHERE aluno_id = %s
+                SELECT id
+                FROM alunos
+                WHERE id = %s
                 """,
                 (id_aluno,)
             )
 
-            existe = cursor.fetchone()
-
-            if not existe:
-
-                cursor.execute(
-                    """
-                    INSERT INTO notas (aluno_id)
-                    VALUES (%s)
-                    """,
-                    (id_aluno,)
-                )
+            if cursor.fetchone() is None:
+                print("Aluno não encontrado.")
+                return
 
             cursor.execute(
                 f"""
@@ -98,17 +89,26 @@ def lancar_nota(usuario):
             print("Nota lançada com sucesso!")
 
         except Error as e:
+
+            conn.rollback()
             print(f"Erro: {e}")
 
         finally:
+
             cursor.close()
             conn.close()
 
+
 def calcular_media(id_aluno):
+
     conn = criar_conexao()
+
     if conn:
+
         cursor = conn.cursor()
+
         try:
+
             cursor.execute(
                 """
                 SELECT matematica,
@@ -121,7 +121,9 @@ def calcular_media(id_aluno):
                        algoritmo
                 FROM notas
                 WHERE aluno_id = %s
-                """,(id_aluno,))
+                """,
+                (id_aluno,)
+            )
 
             notas = cursor.fetchone()
 
@@ -129,13 +131,10 @@ def calcular_media(id_aluno):
                 print("Aluno não possui registro de notas.")
                 return
 
-            notas_validas = [n for n in notas if n is not None]
-
-            media = sum(notas_validas) / len(notas_validas)
+            media = sum(notas) / len(notas)
 
             if media >= 7:
                 situacao = "Aprovado"
-
             else:
                 situacao = "Reprovado"
 
@@ -145,44 +144,70 @@ def calcular_media(id_aluno):
                 SET media = %s,
                     situacao = %s
                 WHERE aluno_id = %s
-                """,(media, situacao, id_aluno))
+                """,
+                (media, situacao, id_aluno)
+            )
 
             conn.commit()
 
         except Error as e:
+
             print(f"Erro: {e}")
 
         finally:
+
             cursor.close()
             conn.close()
 
-def ver_nota(materia):
+
+def ver_nota(usuario, materia):
+
     conn = criar_conexao()
+
     if conn:
+
         cursor = conn.cursor()
+
         try:
 
-            sql = f"""
-            SELECT aluno_id, {materia}
-            FROM notas
-            """
+            cursor.execute(
+                """
+                SELECT id
+                FROM alunos
+                WHERE login = %s
+                """,
+                (usuario,)
+            )
 
-            cursor.execute(sql)
+            aluno = cursor.fetchone()
 
-            notas = cursor.fetchall()
+            if not aluno:
+                print("Aluno não encontrado.")
+                return
 
-            if not notas:
+            aluno_id = aluno[0]
+
+            cursor.execute(
+                f"""
+                SELECT {materia}, media, situacao
+                FROM notas
+                WHERE aluno_id = %s
+                """,
+                (aluno_id,)
+            )
+
+            resultado = cursor.fetchone()
+
+            if not resultado:
                 print("Nenhuma nota encontrada.")
                 return
 
-            print(f"\n--- Nota de {materia} ---")
-            print(f"{'Aluno ID':<10} {'Nota'}")
-            print("-" * 20)
+            print(f"\nMatéria: {materia}")
+            print(f"Nota: {resultado[0]}")
+            print(f"Média: {resultado[1]}")
+            print(f"Situação: {resultado[2]}")
 
-            for nota in notas:
-                print(f"{nota[0]:<10} {nota[1]}")
-
-        except Error as e:
+        except Exception as e:
             print(f"Erro: {e}")
 
         finally:
