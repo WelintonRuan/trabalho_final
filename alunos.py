@@ -84,14 +84,7 @@ def cadastrar_aluno():
                     (login_aluno, senha_aluno, "ALUNO")
                 )
 
-                cursor.execute(
-                    """
-                    INSERT INTO notas (aluno_id)
-                    VALUES (%s)
-                    """,
-                    (aluno_id,)
-                )
-
+                
                 conn.commit()
 
                 print("Aluno cadastrado com sucesso!")
