@@ -1,11 +1,10 @@
 CREATE DATABASE IF NOT EXISTS escola;
 USE escola;
 
--- =====================================
--- TABELA DE USUÁRIOS
--- =====================================
 
-DROP TABLE IF EXISTS usuarios;
+-- =====================================
+-- USUÁRIOS
+-- =====================================
 
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -15,10 +14,8 @@ CREATE TABLE usuarios (
 );
 
 -- =====================================
--- TABELA DE PROFESSORES
+-- PROFESSORES
 -- =====================================
-
-DROP TABLE IF EXISTS professores;
 
 CREATE TABLE professores (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -28,10 +25,8 @@ CREATE TABLE professores (
 );
 
 -- =====================================
--- TABELA DE ALUNOS
+-- ALUNOS
 -- =====================================
-
-DROP TABLE IF EXISTS alunos;
 
 CREATE TABLE alunos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -42,38 +37,62 @@ CREATE TABLE alunos (
 );
 
 -- =====================================
--- TABELA DE NOTAS
+-- NOTAS POR TRIMESTRE
 -- =====================================
-
-DROP TABLE IF EXISTS notas;
 
 CREATE TABLE notas (
 
     id INT AUTO_INCREMENT PRIMARY KEY,
 
-    aluno_id INT NOT NULL UNIQUE,
+    aluno_id INT NOT NULL,
 
-    matematica DECIMAL(4,2) DEFAULT 0,
-    portugues DECIMAL(4,2) DEFAULT 0,
-    ciencias DECIMAL(4,2) DEFAULT 0,
-    geografia DECIMAL(4,2) DEFAULT 0,
-    historia DECIMAL(4,2) DEFAULT 0,
-    edf DECIMAL(4,2) DEFAULT 0,
-    artes DECIMAL(4,2) DEFAULT 0,
-    algoritmo DECIMAL(4,2) DEFAULT 0,
+    materia VARCHAR(30) NOT NULL,
 
-    media DECIMAL(4,2) DEFAULT 0,
-    situacao VARCHAR(20) DEFAULT 'Reprovado',
+    trimestre INT NOT NULL,
+
+    nota1 DECIMAL(4,2) NOT NULL,
+    nota2 DECIMAL(4,2) NOT NULL,
+    nota3 DECIMAL(4,2) NOT NULL,
+
+    media_trimestre DECIMAL(4,2),
 
     CONSTRAINT fk_notas_aluno
         FOREIGN KEY (aluno_id)
         REFERENCES alunos(id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_aluno_materia_trimestre
+        UNIQUE (aluno_id, materia, trimestre)
+);
+
+-- =====================================
+-- MÉDIAS FINAIS
+-- =====================================
+
+CREATE TABLE medias_finais (
+
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    aluno_id INT NOT NULL,
+
+    materia VARCHAR(30) NOT NULL,
+
+    media_final DECIMAL(4,2),
+
+    situacao VARCHAR(20),
+
+    CONSTRAINT fk_media_aluno
+        FOREIGN KEY (aluno_id)
+        REFERENCES alunos(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT uq_aluno_materia
+        UNIQUE (aluno_id, materia)
 );
 
 -- =====================================
 -- ADMINISTRADOR PADRÃO
 -- =====================================
 
-INSERT IGNORE INTO usuarios (login, senha, cargo)
+INSERT INTO usuarios (login, senha, cargo)
 VALUES ('admin', '123', 'ADM');

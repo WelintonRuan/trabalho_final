@@ -16,7 +16,7 @@ from professor import (
     alterar_nome_professor
 )
 
-from notas import lancar_nota, ver_nota
+from notas import lancar_notas, ver_boletim
 from database import criar_conexao
 
 
@@ -139,7 +139,7 @@ def menu_prof(usuario):
 
         if opcao == "1":
 
-            lancar_nota(usuario)
+            lancar_notas(usuario)
 
         elif opcao == "2":
 
@@ -159,21 +159,18 @@ def menu_aluno(usuario):
     while True:
 
         print("\n========= MENU ALUNO =========")
-        print("1 - Ver notas")
+        print("1 - Ver boletim")
         print("0 - Logout")
 
         opcao = input("Escolha: ")
 
         if opcao == "1":
-
-            menu_notas(usuario)
+            ver_boletim(usuario)
 
         elif opcao == "0":
-
             break
 
         else:
-
             print("Opção inválida.")
 
 
@@ -196,35 +193,35 @@ def menu_notas(usuario):
 
         if opcao == "1":
 
-            ver_nota(usuario, "matematica")
+            ver_boletim(usuario, "matematica")
 
         elif opcao == "2":
 
-            ver_nota(usuario, "portugues")
+            ver_boletim(usuario, "portugues")
 
         elif opcao == "3":
 
-            ver_nota(usuario, "ciencias")
+            ver_boletim(usuario, "ciencias")
 
         elif opcao == "4":
 
-            ver_nota(usuario, "geografia")
+            ver_boletim(usuario, "geografia")
 
         elif opcao == "5":
 
-            ver_nota(usuario, "historia")
+            ver_boletim(usuario, "historia")
 
         elif opcao == "6":
 
-            ver_nota(usuario, "edf")
+            ver_boletim(usuario, "edf")
 
         elif opcao == "7":
 
-            ver_nota(usuario, "artes")
+            ver_boletim(usuario, "artes")
 
         elif opcao == "8":
 
-            ver_nota(usuario, "algoritmo")
+            ver_boletim(usuario, "algoritmo")
 
         elif opcao == "0":
 
