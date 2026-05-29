@@ -2,9 +2,9 @@ CREATE DATABASE IF NOT EXISTS escola;
 USE escola;
 
 
--- =====================================
--- USUÁRIOS
--- =====================================
+
+#USUÁRIOS
+
 
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -13,9 +13,9 @@ CREATE TABLE usuarios (
     cargo ENUM('ADM', 'PROF', 'ALUNO') NOT NULL
 );
 
--- =====================================
--- PROFESSORES
--- =====================================
+
+#PROFESSORES
+
 
 CREATE TABLE professores (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -24,9 +24,9 @@ CREATE TABLE professores (
     login VARCHAR(50) UNIQUE NOT NULL
 );
 
--- =====================================
--- ALUNOS
--- =====================================
+
+#ALUNOS
+
 
 CREATE TABLE alunos (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -36,9 +36,9 @@ CREATE TABLE alunos (
     login VARCHAR(50) UNIQUE NOT NULL
 );
 
--- =====================================
--- NOTAS POR TRIMESTRE
--- =====================================
+
+#NOTAS POR TRIMESTRE
+
 
 CREATE TABLE notas (
 
@@ -65,9 +65,9 @@ CREATE TABLE notas (
         UNIQUE (aluno_id, materia, trimestre)
 );
 
--- =====================================
--- MÉDIAS FINAIS
--- =====================================
+
+#MÉDIAS FINAIS
+
 
 CREATE TABLE medias_finais (
 
@@ -90,9 +90,9 @@ CREATE TABLE medias_finais (
         UNIQUE (aluno_id, materia)
 );
 
--- =====================================
--- ADMINISTRADOR PADRÃO
--- =====================================
+
+#ADMINISTRADOR PADRÃO
+
 
 INSERT INTO usuarios (login, senha, cargo)
 VALUES ('admin', '123', 'ADM');

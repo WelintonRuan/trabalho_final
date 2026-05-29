@@ -372,3 +372,119 @@ def alterar_nome_aluno():
 
             cursor.close()
             conn.close()
+
+
+
+def buscar_aluno():
+
+    busca = input(
+        "Digite o ID ou nome do aluno: "
+    ).strip()
+
+    conn = criar_conexao()
+
+    if not conn:
+        return None
+
+    cursor = conn.cursor()
+
+    try:
+
+        if busca.isdigit():
+
+            cursor.execute(
+                """
+                SELECT id, nome, turma
+                FROM alunos
+                WHERE id = %s
+                """,
+                (int(busca),)
+            )
+
+        else:
+
+            cursor.execute(
+                """
+                SELECT id, nome, turma
+                FROM alunos
+                WHERE nome LIKE %s
+                """,
+                (f"%{busca}%",)
+            )
+
+        resultados = cursor.fetchall()
+
+        if not resultados:
+            print("Aluno não encontrado.")
+            return None
+
+        if len(resultados) == 1:
+
+            aluno_id = resultados[0][0]
+            nome_aluno = resultados[0][1]
+            turma_aluno = resultados[0][2]
+
+        else:
+
+            print("\nAlunos encontrados:\n")
+
+            for aluno in resultados:
+
+                print(
+                    f"ID: {aluno[0]} | "
+                    f"Nome: {aluno[1]} | "
+                    f"Turma: {aluno[2]}"
+                )
+
+            while True:
+
+                try:
+
+                    aluno_id = int(
+                        input(
+                            "\nDigite o ID do aluno: "
+                        )
+                    )
+
+                    ids_validos = [
+                        aluno[0]
+                        for aluno in resultados
+                    ]
+
+                    if aluno_id not in ids_validos:
+                        print("ID inválido.")
+                        continue
+
+                    break
+
+                except ValueError:
+
+                    print("Digite apenas números.")
+
+            aluno_selecionado = next(
+                aluno
+                for aluno in resultados
+                if aluno[0] == aluno_id
+            )
+
+            nome_aluno = aluno_selecionado[1]
+            turma_aluno = aluno_selecionado[2]
+
+        print(
+            f"\nAluno selecionado: "
+            f"{nome_aluno} | "
+            f"Turma: {turma_aluno}"
+        )
+
+        return aluno_id
+
+    except Error as e:
+
+        print(f"Erro: {e}")
+        return None
+
+    finally:
+
+        cursor.close()
+        conn.close()
+
