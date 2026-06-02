@@ -38,7 +38,6 @@ O sistema possui diferentes níveis de acesso (Administrador, Professor e Aluno)
 - Selecionar trimestre
 - Lançar notas
 - Atualizar notas já cadastradas
-- Calcular médias trimestrais automaticamente
 
 ### Aluno
 
