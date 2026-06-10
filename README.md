@@ -12,7 +12,8 @@ O sistema possui diferentes níveis de acesso (Administrador, Professor e Aluno)
 
 - Python 3
 - MySQL
-- MySQL Connector/Python
+- pip install mysql-connector-python (MySQL Connector/Python)
+- pip install bcrypt (Hash)
 
 ---
 
