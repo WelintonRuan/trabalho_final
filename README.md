@@ -227,6 +227,9 @@ Senha: 123
 ```bash
 pip install mysql-connector-python
 ```
+```bash
+pip install bcrypt
+```
 
 ### 2. Criar o Banco de Dados
 
