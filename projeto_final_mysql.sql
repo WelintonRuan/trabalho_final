@@ -9,7 +9,7 @@ USE escola;
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     login VARCHAR(50) UNIQUE NOT NULL,
-    senha VARCHAR(50) NOT NULL,
+    senha VARCHAR(255) NOT NULL,
     cargo ENUM('ADM', 'PROF', 'ALUNO') NOT NULL
 );
 
@@ -95,4 +95,4 @@ CREATE TABLE medias_finais (
 
 
 INSERT INTO usuarios (login, senha, cargo)
-VALUES ('admin', '123', 'ADM');
+VALUES ('admin', '$2b$12$evelF1nM4yAFM5H64t8G0.3cWhXSsRpous5X2XTA/0XifAqACtQjm', 'ADM');

@@ -1,5 +1,5 @@
 from mysql.connector import Error
-
+import bcrypt
 from database import criar_conexao
 from utils import verificar_login_existente
 
@@ -192,9 +192,16 @@ def cadastrar_professor():
         print("\n--- Cadastrar Professor ---")
 
         nome = input("Nome do professor: ").strip()
+
         materia = input("Matéria: ").strip().lower()
+
         login_prof = input("Login do professor: ").strip()
+
         senha_prof = input("Senha do professor: ").strip()
+        senha_prof_hash = bcrypt.hashpw(
+            senha_prof.encode(),
+            bcrypt.gensalt()
+        ).decode()
 
         if not nome or not materia or not login_prof or not senha_prof:
             print("Preencha todos os campos.")
@@ -229,7 +236,7 @@ def cadastrar_professor():
                     INSERT INTO usuarios (login, senha, cargo)
                     VALUES (%s, %s, %s)
                     """,
-                    (login_prof, senha_prof, "PROF")
+                    (login_prof, senha_prof_hash, "PROF")
                 )
 
                 conn.commit()

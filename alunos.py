@@ -1,5 +1,5 @@
 from mysql.connector import Error
-
+import bcrypt
 from database import criar_conexao
 from utils import verificar_login_existente
 
@@ -22,7 +22,7 @@ def cadastrar_aluno():
 
                 idade = int(input("Idade: "))
 
-                if idade <= 0:
+                if idade <= 0 and idade > 100:
                     print("Digite uma idade válida.")
                     continue
 
@@ -53,6 +53,10 @@ def cadastrar_aluno():
             continue
 
         senha_aluno = input("Senha do aluno: ").strip()
+        senha_hash = bcrypt.hashpw(
+            senha_aluno.encode(),
+            bcrypt.gensalt()
+        ).decode()
 
         if not senha_aluno:
             print("Senha não pode ser vazia.")
@@ -81,7 +85,7 @@ def cadastrar_aluno():
                     INSERT INTO usuarios (login, senha, cargo)
                     VALUES (%s, %s, %s)
                     """,
-                    (login_aluno, senha_aluno, "ALUNO")
+                    (login_aluno, senha_hash, "ALUNO")
                 )
 
                 

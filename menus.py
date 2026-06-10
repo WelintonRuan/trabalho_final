@@ -1,5 +1,5 @@
 from mysql.connector import Error
-
+import bcrypt
 from alunos import (
     cadastrar_aluno,
     listar_alunos,
@@ -38,11 +38,11 @@ def login():
 
         cursor.execute(
             """
-            SELECT cargo
+            SELECT senha, cargo
             FROM usuarios
-            WHERE login = %s AND senha = %s
+            WHERE login = %s
             """,
-            (usuario, senha)
+            (usuario,)
         )
 
         resultado = cursor.fetchone()
@@ -50,8 +50,16 @@ def login():
         if not resultado:
             print("Usuário ou senha incorretos.")
             return
+        
+        senha_hash = resultado[0]
+        cargo = resultado[1]
 
-        cargo = resultado[0]
+        if not bcrypt.checkpw(
+            senha.encode(),
+            senha_hash.encode()
+        ):
+            print("Usuário ou senha incorretos.")
+            return
 
         print("\nLogin realizado com sucesso!")
 
