@@ -15,7 +15,6 @@ CREATE TABLE usuarios (
 
 
 #PROFESSORES
--
 
 CREATE TABLE professores (
     id INT AUTO_INCREMENT PRIMARY KEY,
