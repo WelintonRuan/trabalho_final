@@ -13,12 +13,12 @@ def cadastrar_professor():
         print("\n--- Cadastrar Professor ---")
 
         materias_validas = [
-            "matematica",
-            "portugues",
-            "ciencias",
+            "matemática",
+            "português",
+            "ciências",
             "geografia",
-            "historia",
-            "educacao fisica",
+            "história",
+            "educaçâo física",
             "artes",
             "algoritmo"
         ]
