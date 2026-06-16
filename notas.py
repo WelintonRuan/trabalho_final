@@ -112,12 +112,12 @@ def calcular_media(id_aluno):
         try:
             cursor.execute(
                 """
-                SELECT matematica,
-                       portugues,
-                       ciencias,
+                SELECT matemática,
+                       português,
+                       ciências,
                        geografia,
-                       historia,
-                       edf,
+                       história,
+                       educação física,
                        artes,
                        algoritmo
                 FROM notas

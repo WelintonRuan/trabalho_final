@@ -97,22 +97,22 @@ def menu_notas():
         opcao = input("Escolha a matéria: ")
 
         if opcao == "1":
-            ver_nota("matematica")
+            ver_nota("matemática")
 
         elif opcao == "2":
-            ver_nota("portugues")
+            ver_nota("português")
 
         elif opcao == "3":
-            ver_nota("ciencias")
+            ver_nota("ciências")
 
         elif opcao == "4":
             ver_nota("geografia")
 
         elif opcao == "5":
-            ver_nota("historia")
+            ver_nota("história")
 
         elif opcao == "6":
-            ver_nota("edf")
+            ver_nota("educação física")
 
         elif opcao == "7":
             ver_nota("artes")
