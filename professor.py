@@ -28,6 +28,10 @@ def cadastrar_professor():
         login_prof = input("Login do professor: ").strip()
         senha_prof = input("Senha do professor: ").strip()
 
+        if not nome.replace(" ","").isalpha():
+            print("O nome deve conter apenas letras ")
+            continue
+        
         if not nome or not materia or not login_prof or not senha_prof:
             print("Preencha todos os campos.")
             continue

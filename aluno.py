@@ -11,6 +11,10 @@ def cadastrar_aluno():
         print("\n--- Cadastrar Aluno ---")
 
         nome = input("Nome do aluno: ").strip()
+        
+        if not nome.replace(" ","").isalpha():
+            print("O nome deve conter apenas letras ")
+            continue
 
         if not nome:
             print("Nome não pode ser vazio.")
