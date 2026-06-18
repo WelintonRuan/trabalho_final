@@ -5,7 +5,7 @@ from database import criar_conexao
 from professor import buscar_materia_professor
 from database import calcular_media
 
-
+#lançamento de nota  
 def lancar_nota(usuario):
 
     materia = buscar_materia_professor(usuario)
@@ -104,7 +104,7 @@ def lancar_nota(usuario):
             cursor.close()
             conn.close()
 
-
+#cálculo da média das notas
 def calcular_media(id_aluno):
     conn = criar_conexao()
     if conn:
@@ -157,7 +157,7 @@ def calcular_media(id_aluno):
             cursor.close()
             conn.close()
 
-
+#visualização das notas 
 def ver_nota(materia):
     conn = criar_conexao()
     if conn:
