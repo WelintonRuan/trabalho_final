@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Alunos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👨‍🎓 Gerenciar Alunos</h1>
+    <button class="btn-primary" onclick="abrirModalCadastro()">+ Novo Aluno</button>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Idade</th>
+            <th>Turma</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for aluno in alunos %}
+        <tr>
+            <td>{{ aluno[0] }}</td>
+            <td>{{ aluno[1] }}</td>
+            <td>{{ aluno[2] }}</td>
+            <td>{{ aluno[3] }}</td>
+            <td>
+                <button class="btn-edit" onclick="editarAluno({{ aluno[0] }}, '{{ aluno[1] }}', {{ aluno[3] }})">✏️</button>
+                <button class="btn-delete" onclick="removerAluno({{ aluno[0] }})">🗑️</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Modal de Cadastro -->
+<div id="modalCadastro" class="modal" style="display:none">
+    <div class="modal-content">
+        <span class="close" onclick="fecharModal()">&times;</span>
+        <h2>Cadastrar Aluno</h2>
+        <form id="formAluno">
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" id="nome" required>
+            </div>
+            <div class="form-group">
+                <label>Idade</label>
+                <input type="number" id="idade" required>
+            </div>
+            <div class="form-group">
+                <label>Turma</label>
+                <input type="number" id="turma" required>
+            </div>
+            <div class="form-group">
+                <label>Login</label>
+                <input type="text" id="login" required>
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="senha" required>
+            </div>
+            <button type="submit" class="btn-primary">Cadastrar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function abrirModalCadastro() {
+    document.getElementById('modalCadastro').style.display = 'block';
+}
+
+function fecharModal() {
+    document.getElementById('modalCadastro').style.display = 'none';
+}
+
+document.getElementById('formAluno').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const dados = {
+        nome: document.getElementById('nome').value,
+        idade: document.getElementById('idade').value,
+        turma: document.getElementById('turma').value,
+        login: document.getElementById('login').value,
+        senha: document.getElementById('senha').value
+    };
+    
+    const response = await fetch('/cadastrar_aluno', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(dados)
+    });
+    
+    const result = await response.json();
+    if (result.success) {
+        alert(result.success);
+        location.reload();
+    } else {
+        alert('Erro: ' + result.error);
+    }
+});
+
+async function removerAluno(id) {
+    if (!confirm('Tem certeza que deseja remover este aluno?')) return;
+    
+    const response = await fetch(`/remover_aluno/${id}`, {
+        method: 'DELETE'
+    });
+    
+    const result = await response.json();
+    if (result.success) {
+        alert(result.success);
+        location.reload();
+    } else {
+        alert('Erro: ' + result.error);
+    }
+}
+
+function editarAluno(id, nome, turma) {
+    const novoNome = prompt('Novo nome:', nome);
+    if (novoNome && novoNome !== nome) {
+        alterarAluno(id, 'nome', novoNome);
+    }
+    
+    const novaTurma = prompt('Nova turma:', turma);
+    if (novaTurma && parseInt(novaTurma) !== turma) {
+        alterarAluno(id, 'turma', novaTurma);
+    }
+}
+
+async function alterarAluno(id, campo, valor) {
+    const response = await fetch('/alterar_aluno', {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({id, campo, valor})
+    });
+    
+    const result = await response.json();
+    if (result.success) {
+        alert(result.success);
+        location.reload();
+    } else {
+        alert('Erro: ' + result.error);
+    }
+}
+</script>
+{% endblock %}

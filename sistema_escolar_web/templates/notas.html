@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Lançar Notas{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>📝 Lançar Notas</h1>
+    <p>Matéria: <strong>{{ materia }}</strong></p>
+</div>
+
+<div class="card" style="padding: 2rem;">
+    <form id="formNotas">
+        <div class="form-group">
+            <label>Aluno</label>
+            <select id="aluno_id" required>
+                <option value="">Selecione um aluno...</option>
+                {% for aluno in alunos %}
+                <option value="{{ aluno[0] }}">{{ aluno[1] }} (Turma {{ aluno[2] }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Trimestre</label>
+            <select id="trimestre" required>
+                <option value="">Selecione...</option>
+                <option value="1">1º Trimestre</option>
+                <option value="2">2º Trimestre</option>
+                <option value="3">3º Trimestre</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label>Nota 1</label>
+            <input type="number" id="nota1" step="0.1" min="0" max="10" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Nota 2</label>
+            <input type="number" id="nota2" step="0.1" min="0" max="10" required>
+        </div>
+        
+        <div class="form-group">
+            <label>Nota 3</label>
+            <input type="number" id="nota3" step="0.1" min="0" max="10" required>
+        </div>
+        
+        <button type="submit" class="btn-primary">Lançar Notas</button>
+    </form>
+</div>
+
+<script>
+document.getElementById('formNotas').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const dados = {
+        aluno_id: document.getElementById('aluno_id').value,
+        trimestre: document.getElementById('trimestre').value,
+        nota1: document.getElementById('nota1').value,
+        nota2: document.getElementById('nota2').value,
+        nota3: document.getElementById('nota3').value
+    };
+    
+    const response = await fetch('/lancar_notas', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(dados)
+    });
+    
+    const result = await response.json();
+    if (result.success) {
+        alert(result.success);
+        document.getElementById('formNotas').reset();
+    } else {
+        alert('Erro: ' + result.error);
+    }
+});
+</script>
+{% endblock %}

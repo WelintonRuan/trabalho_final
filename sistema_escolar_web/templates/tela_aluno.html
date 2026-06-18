@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Aluno{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>👋 Bem-vindo, Aluno!</h1>
+    <div class="dashboard-cards">
+        <div class="card">
+            <div class="card-icon">📊</div>
+            <h3>Boletim</h3>
+            <p>Ver suas notas</p>
+            <a href="/boletim" class="btn-primary">Acessar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
