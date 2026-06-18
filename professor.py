@@ -3,7 +3,7 @@ from binascii import Error
 from database import criar_conexao
 from database import listar_professores, verificar_login_existente
 
-
+#cadastro do professor 
 def cadastrar_professor():
 
     global conexao_global
@@ -79,6 +79,7 @@ def cadastrar_professor():
                 cursor.close()
                 conn.close()
 
+#remoção do professor 
 def remover_professor():
 
     print("\n--- Remover professor ---")
@@ -161,7 +162,7 @@ def remover_professor():
             cursor.close()
             conn.close()
 
-
+#listagem do professor 
 def listar_professores():
     print("\n--- Professores ---")
     conn = criar_conexao()
@@ -193,7 +194,7 @@ def listar_professores():
             cursor.close()
             conn.close()
 
-
+#busca da matéria do professor 
 def buscar_materia_professor(usuario):
 
     conn = criar_conexao()
@@ -227,7 +228,7 @@ def buscar_materia_professor(usuario):
             cursor.close()
             conn.close()
 
-
+#remoção do professor da matéria 
 def deletar_professor_por_materia(materia):
     global conexao_global
     cursor = None
