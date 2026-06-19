@@ -5,42 +5,170 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: #f0f2f5;
     min-height: 100vh;
-}
-
-/* ===== NAVBAR ===== */
-.navbar {
-    background: #1a237e;
-    color: white;
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-}
-
-.nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.nav-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: white;
-    text-decoration: none;
-}
-
-.nav-menu {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    justify-content: center;
 }
 
-.nav-user {
-    color: #e8eaf6;
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 20px;
+}
+
+.login-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0.12);
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    transition: transform 0.2s;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.logo-icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+}
+
+.login-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.5px;
+}
+
+.subtitle {
+    font-size: 16px;
+    color: #6b7280;
+    margin-top: 4px;
+    font-weight: 400;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1a2e;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 15px;
+    transition: all 0.2s;
+    background: #fafafa;
+    font-family: inherit;
+}
+
+.form-group input:focus {
+    border-color: #9ca3af;
+    outline: none;
+    background: white;
+    box-shadow: 0 0 0 4px rgba(79,70,229,0.1);
+}
+
+.form-group input::placeholder {
+    color: #9ca3af;
+}
+
+.btn-login {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    margin-top: 8px;
+}
+
+.btn-login:hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+}
+
+.btn-login:active {
+    transform: translateY(0px)
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.login-footer strong {
+    color: #1a1a2e;
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.alert-success {
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #a7f30d;
+}
+
+.alert-danger {
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.alert-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+}
+
+@media (max-widht: 480px) {
+    .login-card {
+        padding: 32px 20px;
+    }
+    .login-header h1 {
+        font-size: 22px;
+    }
+
+    .logo-icon {
+        font-size: 40px;
+    }
 }
 
 .btn-logout {
@@ -55,134 +183,6 @@ body {
 .btn-logout:hover {
     background: #b71c1c;
 }
-
-/* ===== MAIN CONTENT ===== */
-.main-content {
-    max-width: 1200px;
-    margin: 2rem auto;
-    padding: 0 2rem;
-}
-
-/* ===== ALERTS ===== */
-.alert {
-    padding: 1rem;
-    border-radius: 5px;
-    margin-bottom: 1rem;
-}
-
-.alert-success { background: #c8e6c9; color: #1b5e20; }
-.alert-danger { background: #ffcdd2; color: #b71c1c; }
-.alert-info { background: #bbdefb; color: #0d47a1; }
-
-/* ===== LOGIN ===== */
-.container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1a237e, #0d47a1);
-}
-
-.login-box {
-    background: white;
-    padding: 2.5rem;
-    border-radius: 10px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-    width: 100%;
-    max-width: 400px;
-}
-
-.login-box h1 {
-    text-align: center;
-    color: #1a237e;
-    margin-bottom: 0.5rem;
-}
-
-.login-box h2 {
-    text-align: center;
-    color: #666;
-    font-weight: normal;
-    margin-bottom: 1.5rem;
-}
-
-.demo-info {
-    text-align: center;
-    margin-top: 1rem;
-    color: #666;
-    font-size: 0.9rem;
-    background: #e8eaf6;
-    padding: 0.5rem;
-    border-radius: 5px;
-}
-
-/* ===== FORMULÁRIOS ===== */
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.3rem;
-    color: #333;
-    font-weight: 500;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 0.7rem;
-    border: 2px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-    transition: border 0.3s;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #1a237e;
-    outline: none;
-}
-
-/* ===== BOTÕES ===== */
-.btn-primary {
-    background: #1a237e;
-    color: white;
-    border: none;
-    padding: 0.7rem 1.5rem;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.3s;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-primary:hover {
-    background: #0d47a1;
-}
-
-.btn-edit {
-    background: #ffa000;
-    color: white;
-    border: none;
-    padding: 0.3rem 0.7rem;
-    border-radius: 3px;
-    cursor: pointer;
-    margin-right: 0.3rem;
-}
-
-.btn-edit:hover { background: #ff8f00; }
-
-.btn-delete {
-    background: #d32f2f;
-    color: white;
-    border: none;
-    padding: 0.3rem 0.7rem;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-.btn-delete:hover { background: #b71c1c; }
 
 /* ===== DASHBOARD ===== */
 .dashboard h1 {
