@@ -1,5 +1,5 @@
 from mysql.connector import Error
-
+import bcrypt
 from database import criar_conexao
 from utils import verificar_login_existente
 
@@ -448,3 +448,60 @@ def alterar_materia_professor():
 
     cursor.close()
     conn.close()
+
+def lancar_nota():
+
+    print("\n--- Lançar Nota ---")
+
+    conn = criar_conexao()
+
+    if conn:
+
+        cursor = conn.cursor()
+
+        try:
+
+            aluno_id = int(input("ID do aluno: "))
+
+            nota = float(input("Nota: "))
+
+            if nota < 0 or nota > 10:
+                print("Nota inválida.")
+                return
+
+            confirma = input(
+                f"Confirma lançar nota {nota} para o aluno {aluno_id}? (s/n): "
+            ).strip().lower()
+
+            if confirma != "s":
+                print("Operação cancelada.")
+                return
+
+            cursor.execute(
+                """
+                UPDATE notas
+                SET nota = %s
+                WHERE aluno_id = %s
+                """,
+                (nota, aluno_id)
+            )
+
+            conn.commit()
+
+            print("Nota lançada com sucesso!")
+
+        except ValueError:
+
+            print("Digite valores válidos.")
+
+        except Error as e:
+
+            conn.rollback()
+
+            print(f"Erro: {e}")
+
+        finally:
+
+            cursor.close()
+
+            conn.close()
