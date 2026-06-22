@@ -26,7 +26,7 @@ def cadastrar_aluno():
 
                 idade = int(input("Idade: "))
 
-                if idade <= 0 and idade > 100:
+                if idade <= 0 or idade > 100:
                     print("Digite uma idade válida.")
                     continue
 

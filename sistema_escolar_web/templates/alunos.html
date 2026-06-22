@@ -166,24 +166,52 @@ async function removerAluno(id) {
 }
 
 function editarAluno(id, nomeAtual, turmaAtual) {
-    const novoNome = prompt('Digite um novo nome (apenas letras):', nomeAtual);
-    if (novoNome !== null && novoNome.trim() !== '') {
+    
+    const novoNome = prompt(' Digite o novo nome (apenas letras):', nomeAtual);
+    
+    
+    if (novoNome === null || novoNome.trim() === '') {
+        
+        if (novoNome === null) {
+            
+        } else {
+            alert(' Nome não pode estar vazio!');
+            
+            editarAluno(id, nomeAtual, turmaAtual);
+            return;
+        }
+    } else {
+        
         const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/.test(novoNome.trim());
-        return;
-    }
-    if (!nomeValido) {
-        alert('❌ Nome inválido! Digite apenas letras, espaços e hífens.');
-        return;
-    }
-    if (novoNome.trim() !== nomeAtual) {
-        alterarAluno(id, 'nome', novoNome.trim());
+        if (!nomeValido) {
+            alert(' Nome inválido! Digite apenas letras, espaços e hífens.\nExemplo: Valentina Francisco, Leonardo-Camilo');
+            
+            editarAluno(id, nomeAtual, turmaAtual);
+            return;
+        }
+        
+        if (novoNome.trim() !== nomeAtual) {
+            alterarAluno(id, 'nome', novoNome.trim());
+        }
     }
     
-    const novaTurma = prompt(' Digite a nova turma (número maior que 0):', turmaAtual);
-    if (novaTurma !== null && novaTurma.trim() !== '') {
+   
+    const novaTurma = prompt('✏️ Digite a nova turma (número maior que 0):', turmaAtual);
+    
+    
+    if (novaTurma === null || novaTurma.trim() === '') {
+        if (novaTurma === null) {
+            
+        } else {
+            alert('❌ Turma não pode estar vazia!');
+            editarAluno(id, nomeAtual, turmaAtual);
+            return;
+        }
+    } else {
         const turmaNum = parseInt(novaTurma);
         if (isNaN(turmaNum) || turmaNum < 1) {
-            alert(' Turma inválida! Digite um número maior que 0.');
+            alert('❌ Turma inválida! Digite um número maior que 0.');
+            editarAluno(id, nomeAtual, turmaAtual);
             return;
         }
         if (turmaNum !== turmaAtual) {

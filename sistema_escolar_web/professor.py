@@ -207,6 +207,10 @@ def cadastrar_professor():
             print("Preencha todos os campos.")
             continue
 
+        if not all(parte.replace("-", "").isalpha() for parte in nome.split()):
+            print("Digite apenas letras no nome.")
+            continue 
+
         if materia not in materias_validas:
             print("Matéria inválida.")
             continue
