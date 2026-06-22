@@ -34,7 +34,6 @@
     </tbody>
 </table>
 
-<!-- Modal de Cadastro -->
 <div id="modalCadastro" class="modal" style="display:none">
     <div class="modal-content">
         <span class="close" onclick="fecharModal()">&times;</span>
@@ -42,7 +41,11 @@
         <form id="formAluno">
             <div class="form-group">
                 <label>Nome</label>
-                <input type="text" id="nome" required>
+                <input type="text" id="nome" required
+                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+"
+                        title="Digite apenas números(Espaços e hífens são permitidos.)"
+                        placeholder="ex: Valentina Francisco">
+                <small style="color: #6b7280; font-size: 12px;">apenas letras espaços e hífens.</small>
             </div>
             <div class="form-group">
                 <label>Idade</label>
@@ -58,7 +61,7 @@
             </div>
             <div class="form-group">
                 <label>Senha</label>
-                <input type="password" id="senha" required>
+                <input type="password" id="senha" required minleght="8" placeholder="Mínimo 8 caracteres">
             </div>
             <button type="submit" class="btn-primary">Cadastrar</button>
         </form>
@@ -77,70 +80,136 @@ function fecharModal() {
 document.getElementById('formAluno').addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    const dados = {
-        nome: document.getElementById('nome').value,
-        idade: document.getElementById('idade').value,
-        turma: document.getElementById('turma').value,
-        login: document.getElementById('login').value,
-        senha: document.getElementById('senha').value
-    };
     
-    const response = await fetch('/cadastrar_aluno', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(dados)
-    });
+        const nome= document.getElementById('nome').value.trim();
+        const idade= document.getElementById('idade').value.trim();
+        const turma= document.getElementById('turma').value.trim();
+        const login= document.getElementById('login').value.trim();
+        const senha= document.getElementById('senha').value;
     
-    const result = await response.json();
-    if (result.success) {
-        alert(result.success);
-        location.reload();
-    } else {
-        alert('Erro: ' + result.error);
+        const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/.test(nome);
+        if (!nomeValido) {
+            alert('Nome inválido! Digite apenas letras, espaços e hífens. \nexemplo: Welinton eleuterio, Leonardo-Frank');
+            document.getelementsbyId('nome').focus();
+            return;
+        }
+
+        if (idade === '' || isNaN(idade) || parseInt(idade) < 7 || parseInt(idade) > 18 ) {
+            alert(' Idade Inválida! digite um valor entre 7 a 18 anos.');
+            document.getElementById('idade').focus();
+            return;
+        }
+
+        if (turma === '' || isNaN(turma) || parseInt(turma) < 1) {
+            alert(' turma Inválida! digite um valor maior que 0.');
+            document.getElementById('turma').focus();
+            return;
+        }
+
+        if (login === '') {
+            alert('login não pode estar vazio!')
+            document.getElementById('login').focus();
+            return;
+        }
+
+        if (senha.length < 8) {
+            alert('Senha muito curta! Digite pelo menos 8 caracteres.')
+            document.getElementById('senha').focus();
+            return;
+        }
+
+        const dados = {
+            nome: nome,
+            idade: parseInt(idade),
+            turma: parseInt(turma),
+            login: login,
+            senha: senha
+        };
+
+    try {
+        const response = await fetch('/cadastrar_aluno', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(dados)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert(result.success);
+            location.reload();
+        } else {
+            alert('Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert(' Erro de conexão: ' + error.message);
     }
 });
 
 async function removerAluno(id) {
     if (!confirm('Tem certeza que deseja remover este aluno?')) return;
     
-    const response = await fetch(`/remover_aluno/${id}`, {
-        method: 'DELETE'
-    });
-    
-    const result = await response.json();
-    if (result.success) {
-        alert(result.success);
-        location.reload();
-    } else {
-        alert('Erro: ' + result.error);
+    try {
+        const response = await fetch(`/remover_aluno/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert(result.success);
+            location.reload();
+        } else {
+            alert('Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert(' Erro de conexão: ' + error.message);
     }
 }
 
-function editarAluno(id, nome, turma) {
-    const novoNome = prompt('Novo nome:', nome);
-    if (novoNome && novoNome !== nome) {
-        alterarAluno(id, 'nome', novoNome);
+function editarAluno(id, nomeAtual, turmaAtual) {
+    const novoNome = prompt('Digite um novo nome (apenas letras):', nomeAtual);
+    if (novoNome !== null && novoNome.trim() !== '') {
+        const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/.test(novoNome.trim());
+        return;
+    }
+    if (!nomeValido) {
+        alert('❌ Nome inválido! Digite apenas letras, espaços e hífens.');
+        return;
+    }
+    if (novoNome.trim() !== nomeAtual) {
+        alterarAluno(id, 'nome', novoNome.trim());
     }
     
-    const novaTurma = prompt('Nova turma:', turma);
-    if (novaTurma && parseInt(novaTurma) !== turma) {
-        alterarAluno(id, 'turma', novaTurma);
+    const novaTurma = prompt(' Digite a nova turma (número maior que 0):', turmaAtual);
+    if (novaTurma !== null && novaTurma.trim() !== '') {
+        const turmaNum = parseInt(novaTurma);
+        if (isNaN(turmaNum) || turmaNum < 1) {
+            alert(' Turma inválida! Digite um número maior que 0.');
+            return;
+        }
+        if (turmaNum !== turmaAtual) {
+            alterarAluno(id, 'turma', turmaNum);
+        }
     }
 }
+
 
 async function alterarAluno(id, campo, valor) {
-    const response = await fetch('/alterar_aluno', {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({id, campo, valor})
-    });
-    
-    const result = await response.json();
-    if (result.success) {
-        alert(result.success);
-        location.reload();
-    } else {
-        alert('Erro: ' + result.error);
+    try {
+        const response = await fetch('/alterar_aluno', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id, campo, valor})
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('' + result.success);
+            location.reload();
+        } else {
+            alert('Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert('  Erro de conexão: ' + error.message);
     }
 }
 </script>

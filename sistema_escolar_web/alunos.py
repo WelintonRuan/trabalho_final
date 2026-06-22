@@ -16,6 +16,10 @@ def cadastrar_aluno():
             print("Nome não pode ser vazio.")
             continue
 
+        if not all(parte.replace("-","").isalpha() for parte in nome.split()):
+            print("digite apenas letras no nome.")
+            continue
+
         while True:
 
             try:
@@ -349,6 +353,10 @@ def alterar_nome_aluno():
 
             if not novo_nome:
                 print("Nome inválido.")
+                return
+            
+            if not all(parte.replace("-","").isalpha() for parte in novo_nome.split()):
+                print("digite apenas letras no nome.")
                 return
 
             cursor.execute(
