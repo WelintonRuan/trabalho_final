@@ -3,7 +3,7 @@ import bcrypt
 from database import criar_conexao
 from utils import verificar_login_existente
 
-
+#listagem dos professores
 def listar_professores():
 
     print("\n--- Professores ---")
@@ -52,7 +52,7 @@ def listar_professores():
             cursor.close()
             conn.close()
 
-
+#remoção do professor 
 def remover_professor():
 
     print("\n--- Remover professor ---")
@@ -136,7 +136,7 @@ def remover_professor():
             cursor.close()
             conn.close()
 
-
+#busca da matéria do professor 
 def buscar_materia_professor(usuario):
 
     conn = criar_conexao()
@@ -173,7 +173,7 @@ def buscar_materia_professor(usuario):
             cursor.close()
             conn.close()
 
-
+#cadastro do proessor 
 def cadastrar_professor():
 
     materias_validas = [
@@ -305,7 +305,7 @@ def deletar_professor_por_materia(materia):
         cursor.close()
         conn.close()
 
-
+#alteração do nome do professor 
 def alterar_nome_professor():
 
     if not listar_professores():
@@ -366,7 +366,7 @@ def alterar_nome_professor():
             cursor.close()
             conn.close()
 
-
+#alteração da matéria do professor 
 def alterar_materia_professor():
 
     if not listar_professores():
