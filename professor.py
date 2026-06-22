@@ -505,3 +505,75 @@ def lancar_nota():
             cursor.close()
 
             conn.close()
+
+#alteração na turma do aluno 
+def alterar_turma_aluno():
+
+    if not listar_alunos():
+        return
+
+    conn = criar_conexao()
+
+    if conn:
+
+        cursor = conn.cursor()
+
+        try:
+
+            aluno_id = int(input("ID do aluno: "))
+
+            cursor.execute(
+                """
+                SELECT id
+                FROM alunos
+                WHERE id = %s
+                """,
+                (aluno_id,)
+            )
+
+            if cursor.fetchone() is None:
+                print("Aluno não encontrado.")
+                return
+
+            nova_turma = input("Nova turma: ").strip()
+
+            if not nova_turma:
+                print("Turma inválida.")
+                return
+
+            confirma = input(
+                f"Confirma alterar para a turma '{nova_turma}'? (s/n): "
+            ).strip().lower()
+
+            if confirma != "s":
+                print("Operação cancelada.")
+                return
+
+            cursor.execute(
+                """
+                UPDATE alunos
+                SET turma = %s
+                WHERE id = %s
+                """,
+                (nova_turma, aluno_id)
+            )
+
+            conn.commit()
+
+            print("Turma alterada com sucesso!")
+
+        except ValueError:
+
+            print("Digite apenas números.")
+
+        except Error as e:
+
+            conn.rollback()
+
+            print(f"Erro: {e}")
+
+        finally:
+
+            cursor.close()
+
+            conn.close()
