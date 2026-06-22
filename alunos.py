@@ -316,7 +316,7 @@ def alterar_turma_aluno():
             cursor.close()
             conn.close()
 
-
+#alteração nome do aluno
 def alterar_nome_aluno():
 
     if not listar_alunos():
@@ -378,7 +378,7 @@ def alterar_nome_aluno():
             conn.close()
 
 
-
+#busca do aluno
 def buscar_aluno():
 
     busca = input(
