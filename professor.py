@@ -254,7 +254,7 @@ def cadastrar_professor():
                 cursor.close()
                 conn.close()
 
-
+#remoção do professor da matéria
 def deletar_professor_por_materia(materia):
 
     conn = criar_conexao()
@@ -449,6 +449,7 @@ def alterar_materia_professor():
     cursor.close()
     conn.close()
 
+#lançamento de notas
 def lancar_nota():
 
     print("\n--- Lançar Nota ---")
