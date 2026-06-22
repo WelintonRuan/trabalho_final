@@ -1,5 +1,5 @@
 from mysql.connector import Error
-import bcrypt
+
 from database import criar_conexao
 from utils import verificar_login_existente
 
@@ -405,35 +405,46 @@ def alterar_materia_professor():
             if cursor.fetchone() is None:
                 print("Professor não encontrado.")
                 return
+        except:
+            print("Erro")
 
-            nova_materia = input("Nova matéria: ").strip().lower()
+        nova_materia = input("Nova matéria: ").strip().lower()
 
-            if nova_materia not in materias_validas:
-                print("Matéria inválida.")
-                return
+    if nova_materia not in materias_validas:
+        print("Matéria inválida.")
+        return
 
-            cursor.execute(
-                """
-                UPDATE professores
-                SET materia = %s
-                WHERE id = %s
-                """,
-                (nova_materia, professor_id)
-            )
+    confirma = input(
+        f"Confirma alterar para '{nova_materia}'? (s/n): "
+    ).strip().lower()
 
-            conn.commit()
+    if confirma != "s":
+        print("Operação cancelada.")
+        return
 
-            print("Matéria alterada com sucesso!")
+    cursor.execute(
+        """
+        UPDATE professores
+        SET materia = %s
+        WHERE id = %s
+        """,
+        (nova_materia, professor_id)
+    )
 
-        except ValueError:
+    conn.commit()
 
-            print("Digite apenas números.")
+    print("Matéria alterada com sucesso!")
 
-        except Error as e:
+    if ValueError:
 
-            print(f"Erro: {e}")
+     print("Digite apenas números.")
 
-        finally:
+    elif Error:
 
-            cursor.close()
-            conn.close()
+     print(f"Erro: {e}")
+
+    else:
+        print("y")
+
+    cursor.close()
+    conn.close()
