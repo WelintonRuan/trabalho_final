@@ -32,7 +32,6 @@
     </tbody>
 </table>
 
-<!-- Modal de Cadastro -->
 <div id="modalCadastro" class="modal" style="display:none">
     <div class="modal-content">
         <span class="close" onclick="fecharModal()">&times;</span>
@@ -40,8 +39,13 @@
         <form id="formProfessor">
             <div class="form-group">
                 <label>Nome</label>
-                <input type="text" id="nome" required>
+                <input type="text" id="nome" required 
+                       pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+" 
+                       title="Digite apenas letras (espaços e hífens são permitidos)"
+                       placeholder="Ex: João Silva">
+                <small style="color: #6b7280; font-size: 12px;">Apenas letras, espaços e hífens</small>
             </div>
+            
             <div class="form-group">
                 <label>Matéria</label>
                 <select id="materia" required>
@@ -56,14 +60,19 @@
                     <option value="algoritmo">Algoritmo</option>
                 </select>
             </div>
+            
+            
             <div class="form-group">
                 <label>Login</label>
-                <input type="text" id="login" required>
+                <input type="text" id="login" required placeholder="Login do professor">
             </div>
+            
+            
             <div class="form-group">
                 <label>Senha</label>
-                <input type="password" id="senha" required>
+                <input type="password" id="senha" required placeholder="Mínimo 8 caracteres" minlength="8">
             </div>
+            
             <button type="submit" class="btn-primary">Cadastrar</button>
         </form>
     </div>
@@ -78,72 +87,128 @@ function fecharModal() {
     document.getElementById('modalCadastro').style.display = 'none';
 }
 
+
 document.getElementById('formProfessor').addEventListener('submit', async function(e) {
     e.preventDefault();
     
+    
+    const nome = document.getElementById('nome').value.trim();
+    const materia = document.getElementById('materia').value;
+    const login = document.getElementById('login').value.trim();
+    const senha = document.getElementById('senha').value;
+    
+    
+    
+    
+    const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/.test(nome);
+    if (!nomeValido) {
+        alert(' Nome inválido! Digite apenas letras, espaços e hífens.\nExemplo: welinton-torturas, tony cross');
+        return;
+    }
+    
+    
+    if (materia === '') {
+        alert(' Selecione uma matéria!');
+        return;
+    }
+    
+    
+    if (login === '') {
+        alert(' Login não pode estar vazio!');
+        return;
+    }
+    
+    
+    if (senha.length < 8) {
+        alert(' Senha muito curta! Digite pelo menos 8 caracteres.');
+        return;
+    }
+    
     const dados = {
-        nome: document.getElementById('nome').value,
-        materia: document.getElementById('materia').value,
-        login: document.getElementById('login').value,
-        senha: document.getElementById('senha').value
+        nome: nome,
+        materia: materia,
+        login: login,
+        senha: senha
     };
     
-    const response = await fetch('/cadastrar_professor', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(dados)
-    });
-    
-    const result = await response.json();
-    if (result.success) {
-        alert(result.success);
-        location.reload();
-    } else {
-        alert('Erro: ' + result.error);
+    try {
+        const response = await fetch('/cadastrar_professor', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(dados)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('✅ ' + result.success);
+            fecharModal();
+            location.reload();
+        } else {
+            alert('❌ Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Erro de conexão: ' + error.message);
     }
 });
 
 async function removerProfessor(id) {
     if (!confirm('Tem certeza que deseja remover este professor?')) return;
     
-    const response = await fetch(`/remover_professor/${id}`, {
-        method: 'DELETE'
-    });
-    
-    const result = await response.json();
-    if (result.success) {
-        alert(result.success);
-        location.reload();
-    } else {
-        alert('Erro: ' + result.error);
+    try {
+        const response = await fetch(`/remover_professor/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('✅ ' + result.success);
+            location.reload();
+        } else {
+            alert(' Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert(' Erro de conexão: ' + error.message);
     }
 }
 
-function editarProfessor(id, nome, materia) {
-    const novoNome = prompt('Novo nome:', nome);
-    if (novoNome && novoNome !== nome) {
-        alterarProfessor(id, 'nome', novoNome);
+function editarProfessor(id, nomeAtual, materiaAtual) {
+    const novoNome = prompt('✏️ Digite o novo nome (apenas letras):', nomeAtual);
+    if (novoNome !== null && novoNome.trim() !== '') {
+        const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/.test(novoNome.trim());
+        if (!nomeValido) {
+            alert('❌ Nome inválido! Digite apenas letras, espaços e hífens.');
+            return;
+        }
+        if (novoNome.trim() !== nomeAtual) {
+            alterarProfessor(id, 'nome', novoNome.trim());
+        }
     }
     
-    const novaMateria = prompt('Nova matéria:', materia);
-    if (novaMateria && novaMateria !== materia) {
-        alterarProfessor(id, 'materia', novaMateria);
+    const novaMateria = prompt('✏️ Digite a nova matéria:', materiaAtual);
+    if (novaMateria !== null && novaMateria.trim() !== '') {
+        if (novaMateria.trim() !== materiaAtual) {
+            alterarProfessor(id, 'materia', novaMateria.trim());
+        }
     }
 }
 
 async function alterarProfessor(id, campo, valor) {
-    const response = await fetch('/alterar_professor', {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({id, campo, valor})
-    });
-    
-    const result = await response.json();
-    if (result.success) {
-        alert(result.success);
-        location.reload();
-    } else {
-        alert('Erro: ' + result.error);
+    try {
+        const response = await fetch('/alterar_professor', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id, campo, valor})
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('✅ ' + result.success);
+            location.reload();
+        } else {
+            alert('Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert('Erro de conexão: ' + error.message);
     }
 }
 </script>
