@@ -89,7 +89,7 @@ document.getElementById('formAluno').addEventListener('submit', async function(e
     
         const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/.test(nome);
         if (!nomeValido) {
-            alert('Nome inválido! Digite apenas letras, espaços e hífens. \nexemplo: Welinton eleuterio, Leonardo-Frank');
+            alert('Nome inválido! Digite apenas letras, espaços e hífens. \nexemplo: Welinton Francisco, Leonardo-Frank');
             document.getelementsbyId('nome').focus();
             return;
         }
