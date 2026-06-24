@@ -182,7 +182,7 @@ def cadastrar_professor():
         "ciencias",
         "geografia",
         "historia",
-        "edf",
+        "educaçao fisica",
         "artes",
         "algoritmo"
     ]
@@ -391,7 +391,7 @@ def alterar_materia_professor():
         "ciencias",
         "geografia",
         "historia",
-        "edf",
+        "educaçao fisica",
         "artes",
         "algoritmo"
     ]
