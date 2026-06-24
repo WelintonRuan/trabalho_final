@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Professores{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👨‍🏫 Gerenciar Professores</h1>
+    <button class="btn-primary" onclick="abrirModalCadastro()">+ Novo Professor</button>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Matéria</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for prof in professores %}
+        <tr>
+            <td>{{ prof[0] }}</td>
+            <td>{{ prof[1] }}</td>
+            <td>{{ prof[2] }}</td>
+            <td>
+                <button class="btn-edit" onclick="editarProfessor({{ prof[0] }}, '{{ prof[1] }}', '{{ prof[2] }}')">✏️</button>
+                <button class="btn-delete" onclick="removerProfessor({{ prof[0] }})">🗑️</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div id="modalCadastro" class="modal" style="display:none">
+    <div class="modal-content">
+        <span class="close" onclick="fecharModal()">&times;</span>
+        <h2>Cadastrar Professor</h2>
+        <form id="formProfessor">
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" id="nome" required 
+                       pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+" 
+                       title="Digite apenas letras (espaços e hífens são permitidos)"
+                       placeholder="Ex: João Silva">
+                <small style="color: #6b7280; font-size: 12px;">Apenas letras, espaços e hífens</small>
+            </div>
+            
+            <div class="form-group">
+                <label>Matéria</label>
+                <select id="materia" required>
+                    <option value="">Selecione...</option>
+                    <option value="matematica">Matemática</option>
+                    <option value="portugues">Português</option>
+                    <option value="ciencias">Ciências</option>
+                    <option value="geografia">Geografia</option>
+                    <option value="historia">História</option>
+                    <option value="edf">Educação Física</option>
+                    <option value="artes">Artes</option>
+                    <option value="algoritmo">Algoritmo</option>
+                </select>
+            </div>
+            
+            
+            <div class="form-group">
+                <label>Login</label>
+                <input type="text" id="login" required placeholder="Login do professor">
+            </div>
+            
+            
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="senha" required placeholder="Mínimo 8 caracteres" minlength="8">
+            </div>
+            
+            <button type="submit" class="btn-primary">Cadastrar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function abrirModalCadastro() {
+    document.getElementById('modalCadastro').style.display = 'block';
+}
+
+function fecharModal() {
+    document.getElementById('modalCadastro').style.display = 'none';
+}
+
+
+document.getElementById('formProfessor').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    
+    const nome = document.getElementById('nome').value.trim();
+    const materia = document.getElementById('materia').value;
+    const login = document.getElementById('login').value.trim();
+    const senha = document.getElementById('senha').value;
+    
+    
+    
+    
+    const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/.test(nome);
+    if (!nomeValido) {
+        alert(' Nome inválido! Digite apenas letras, espaços e hífens.\nExemplo: welinton-torturas, tony cross');
+        return;
+    }
+    
+    
+    if (materia === '') {
+        alert(' Selecione uma matéria!');
+        return;
+    }
+    
+    
+    if (login === '') {
+        alert(' Login não pode estar vazio!');
+        return;
+    }
+    
+    
+    if (senha.length < 8) {
+        alert(' Senha muito curta! Digite pelo menos 8 caracteres.');
+        return;
+    }
+    
+    const dados = {
+        nome: nome,
+        materia: materia,
+        login: login,
+        senha: senha
+    };
+    
+    try {
+        const response = await fetch('/cadastrar_professor', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(dados)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('✅ ' + result.success);
+            fecharModal();
+            location.reload();
+        } else {
+            alert('❌ Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert('❌ Erro de conexão: ' + error.message);
+    }
+});
+
+async function removerProfessor(id) {
+    if (!confirm('Tem certeza que deseja remover este professor?')) return;
+    
+    try {
+        const response = await fetch(`/remover_professor/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('✅ ' + result.success);
+            location.reload();
+        } else {
+            alert(' Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert(' Erro de conexão: ' + error.message);
+    }
+}
+
+function editarProfessor(id, nomeAtual, materiaAtual) {
+    const novoNome = prompt('✏️ Digite o novo nome (apenas letras):', nomeAtual);
+    if (novoNome !== null && novoNome.trim() !== '') {
+        const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/.test(novoNome.trim());
+        if (!nomeValido) {
+            alert('❌ Nome inválido! Digite apenas letras, espaços e hífens.');
+            return;
+        }
+        if (novoNome.trim() !== nomeAtual) {
+            alterarProfessor(id, 'nome', novoNome.trim());
+        }
+    }
+    
+    const novaMateria = prompt('✏️ Digite a nova matéria:', materiaAtual);
+    if (novaMateria !== null && novaMateria.trim() !== '') {
+        if (novaMateria.trim() !== materiaAtual) {
+            alterarProfessor(id, 'materia', novaMateria.trim());
+        }
+    }
+}
+
+async function alterarProfessor(id, campo, valor) {
+    try {
+        const response = await fetch('/alterar_professor', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id, campo, valor})
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('✅ ' + result.success);
+            location.reload();
+        } else {
+            alert('Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert('Erro de conexão: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

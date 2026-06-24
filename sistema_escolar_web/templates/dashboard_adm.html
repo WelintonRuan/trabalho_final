@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard ADM{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <h1>👋 Bem-vindo, Administrador!</h1>
+    <div class="dashboard-cards">
+        <div class="card">
+            <div class="card-icon">👨‍🎓</div>
+            <h3>Alunos</h3>
+            <p>Gerenciar alunos</p>
+            <a href="/alunos" class="btn-primary">Acessar</a>
+        </div>
+        <div class="card">
+            <div class="card-icon">👨‍🏫</div>
+            <h3>Professores</h3>
+            <p>Gerenciar professores</p>
+            <a href="/professores" class="btn-primary">Acessar</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

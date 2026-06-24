@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Gerenciar Alunos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>👨‍🎓 Gerenciar Alunos</h1>
+    <button class="btn-primary" onclick="abrirModalCadastro()">+ Novo Aluno</button>
+</div>
+
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Idade</th>
+            <th>Turma</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for aluno in alunos %}
+        <tr>
+            <td>{{ aluno[0] }}</td>
+            <td>{{ aluno[1] }}</td>
+            <td>{{ aluno[2] }}</td>
+            <td>{{ aluno[3] }}</td>
+            <td>
+                <button class="btn-edit" onclick="editarAluno({{ aluno[0] }}, '{{ aluno[1] }}', {{ aluno[3] }})">✏️</button>
+                <button class="btn-delete" onclick="removerAluno({{ aluno[0] }})">🗑️</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<div id="modalCadastro" class="modal" style="display:none">
+    <div class="modal-content">
+        <span class="close" onclick="fecharModal()">&times;</span>
+        <h2>Cadastrar Aluno</h2>
+        <form id="formAluno">
+            <div class="form-group">
+                <label>Nome</label>
+                <input type="text" id="nome" required
+                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+"
+                        title="Digite apenas números(Espaços e hífens são permitidos.)"
+                        placeholder="ex: Valentina Francisco">
+                <small style="color: #6b7280; font-size: 12px;">apenas letras espaços e hífens.</small>
+            </div>
+            <div class="form-group">
+                <label>Idade</label>
+                <input type="number" id="idade" required>
+            </div>
+            <div class="form-group">
+                <label>Turma</label>
+                <input type="number" id="turma" required>
+            </div>
+            <div class="form-group">
+                <label>Login</label>
+                <input type="text" id="login" required>
+            </div>
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="senha" required minleght="8" placeholder="Mínimo 8 caracteres">
+            </div>
+            <button type="submit" class="btn-primary">Cadastrar</button>
+        </form>
+    </div>
+</div>
+
+<script>
+function abrirModalCadastro() {
+    document.getElementById('modalCadastro').style.display = 'block';
+}
+
+function fecharModal() {
+    document.getElementById('modalCadastro').style.display = 'none';
+}
+
+document.getElementById('formAluno').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    
+        const nome= document.getElementById('nome').value.trim();
+        const idade= document.getElementById('idade').value.trim();
+        const turma= document.getElementById('turma').value.trim();
+        const login= document.getElementById('login').value.trim();
+        const senha= document.getElementById('senha').value;
+    
+        const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/.test(nome);
+        if (!nomeValido) {
+            alert('Nome inválido! Digite apenas letras, espaços e hífens. \nexemplo: Welinton Francisco, Leonardo-Frank');
+            document.getelementsbyId('nome').focus();
+            return;
+        }
+
+        if (idade === '' || isNaN(idade) || parseInt(idade) < 7 || parseInt(idade) > 18 ) {
+            alert(' Idade Inválida! digite um valor entre 7 a 18 anos.');
+            document.getElementById('idade').focus();
+            return;
+        }
+
+        if (turma === '' || isNaN(turma) || parseInt(turma) < 1) {
+            alert(' turma Inválida! digite um valor maior que 0.');
+            document.getElementById('turma').focus();
+            return;
+        }
+
+        if (login === '') {
+            alert('login não pode estar vazio!')
+            document.getElementById('login').focus();
+            return;
+        }
+
+        if (senha.length < 8) {
+            alert('Senha muito curta! Digite pelo menos 8 caracteres.')
+            document.getElementById('senha').focus();
+            return;
+        }
+
+        const dados = {
+            nome: nome,
+            idade: parseInt(idade),
+            turma: parseInt(turma),
+            login: login,
+            senha: senha
+        };
+
+    try {
+        const response = await fetch('/cadastrar_aluno', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(dados)
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert(result.success);
+            location.reload();
+        } else {
+            alert('Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert(' Erro de conexão: ' + error.message);
+    }
+});
+
+async function removerAluno(id) {
+    if (!confirm('Tem certeza que deseja remover este aluno?')) return;
+    
+    try {
+        const response = await fetch(`/remover_aluno/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert(result.success);
+            location.reload();
+        } else {
+            alert('Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert(' Erro de conexão: ' + error.message);
+    }
+}
+
+function editarAluno(id, nomeAtual, turmaAtual) {
+    
+    const novoNome = prompt(' Digite o novo nome (apenas letras):', nomeAtual);
+    
+    
+    if (novoNome === null || novoNome.trim() === '') {
+        
+        if (novoNome === null) {
+            
+        } else {
+            alert(' Nome não pode estar vazio!');
+            
+            editarAluno(id, nomeAtual, turmaAtual);
+            return;
+        }
+    } else {
+        
+        const nomeValido = /^[A-Za-zÀ-ÖØ-öø-ÿ\s\-]+$/.test(novoNome.trim());
+        if (!nomeValido) {
+            alert(' Nome inválido! Digite apenas letras, espaços e hífens.\nExemplo: Valentina Francisco, Leonardo-Camilo');
+            
+            editarAluno(id, nomeAtual, turmaAtual);
+            return;
+        }
+        
+        if (novoNome.trim() !== nomeAtual) {
+            alterarAluno(id, 'nome', novoNome.trim());
+        }
+    }
+    
+   
+    const novaTurma = prompt('✏️ Digite a nova turma (número maior que 0):', turmaAtual);
+    
+    
+    if (novaTurma === null || novaTurma.trim() === '') {
+        if (novaTurma === null) {
+            
+        } else {
+            alert('❌ Turma não pode estar vazia!');
+            editarAluno(id, nomeAtual, turmaAtual);
+            return;
+        }
+    } else {
+        const turmaNum = parseInt(novaTurma);
+        if (isNaN(turmaNum) || turmaNum < 1) {
+            alert('❌ Turma inválida! Digite um número maior que 0.');
+            editarAluno(id, nomeAtual, turmaAtual);
+            return;
+        }
+        if (turmaNum !== turmaAtual) {
+            alterarAluno(id, 'turma', turmaNum);
+        }
+    }
+}
+
+
+async function alterarAluno(id, campo, valor) {
+    try {
+        const response = await fetch('/alterar_aluno', {
+            method: 'PUT',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({id, campo, valor})
+        });
+        
+        const result = await response.json();
+        if (result.success) {
+            alert('' + result.success);
+            location.reload();
+        } else {
+            alert('Erro: ' + result.error);
+        }
+    } catch (error) {
+        alert('  Erro de conexão: ' + error.message);
+    }
+}
+</script>
+{% endblock %}

@@ -207,12 +207,20 @@ def cadastrar_professor():
             print("Preencha todos os campos.")
             continue
 
+        if not all(parte.replace("-", "").isalpha() for parte in nome.split()):
+            print("Digite apenas letras no nome.")
+            continue 
+
         if materia not in materias_validas:
             print("Matéria inválida.")
             continue
 
         if verificar_login_existente(login_prof):
             print("Login já existe.")
+            continue
+
+        if not all(parte.replace("-","").isalpha() for parte in nome.split()):
+            print("digite apenas letras no nome.")
             continue
 
         conn = criar_conexao()
@@ -310,6 +318,7 @@ def alterar_nome_professor():
 
     if not listar_professores():
         return
+    
 
     conn = criar_conexao()
 
@@ -338,6 +347,10 @@ def alterar_nome_professor():
 
             if not novo_nome:
                 print("Nome inválido.")
+                return
+            
+            if not all(parte.replace("-","").isalpha() for parte in novo_nome.split()):
+                print("digite apenas letras no nome.")
                 return
 
             cursor.execute(
