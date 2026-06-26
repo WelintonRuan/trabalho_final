@@ -2,7 +2,7 @@ import mysql.connector
 from mysql.connector import Error
 import os
 
-
+#criação da conexão 
 def criar_conexao():
 
     try:
