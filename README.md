@@ -1,258 +1,279 @@
-# Sistema Escolar
+# 🎓 Sistema Escolar Web
 
-## Descrição
+Sistema desenvolvido em **Python + Flask + MySQL** para gerenciamento escolar.
 
-O Sistema Escolar é uma aplicação desenvolvida em Python integrada ao banco de dados MySQL para gerenciamento de alunos, professores e notas escolares.
-
-O sistema possui diferentes níveis de acesso (Administrador, Professor e Aluno), permitindo o controle de usuários, lançamento de notas e consulta de boletins.
+Permite controle de acesso por perfil (**Administrador, Professor e Aluno**), gerenciamento de usuários, lançamento de notas e consulta de boletins.
 
 ---
 
-## Tecnologias Utilizadas
+# 📌 Funcionalidades
 
-- Python 3
-- MySQL
-- pip install mysql-connector-python (MySQL Connector/Python)
-- pip install bcrypt (Hash)
+## 👨‍💼 Administrador
 
----
-
-## Funcionalidades
-
-### Administrador
-
-- Cadastrar professores
-- Remover professores
-- Listar professores
-- Alterar nome dos professores
-- Alterar matéria dos professores
-- Cadastrar alunos
-- Remover alunos
-- Listar alunos
-- Alterar nome dos alunos
-- Alterar turma dos alunos
-
-### Professor
-
-- Listar alunos
-- Buscar alunos por nome ou ID
-- Selecionar trimestre
-- Lançar notas
-- Atualizar notas já cadastradas
-
-### Aluno
-
-- Consultar boletim
-- Visualizar notas por matéria
-- Visualizar notas dos três trimestres
-- Visualizar médias trimestrais
-- Visualizar média final
-- Consultar situação final
+* Cadastrar professores
+* Remover professores
+* Listar professores
+* Alterar nome dos professores
+* Alterar matéria dos professores
+* Cadastrar alunos
+* Remover alunos
+* Listar alunos
+* Alterar nome dos alunos
+* Alterar turma dos alunos
 
 ---
 
-## Controle de Acesso
+## 👨‍🏫 Professor
 
-O sistema possui autenticação por login e senha.
-
-### Tipos de Usuário
-
-| Cargo | Descrição |
-|---------|---------|
-| ADM | Administrador |
-| PROF | Professor |
-| ALUNO | Aluno |
-
-### Permissões
-
-**Administrador**
-- Gerencia alunos
-- Gerencia professores
-
-**Professor**
-- Lança notas
-- Consulta alunos
-
-**Aluno**
-- Consulta seu boletim
+* Listar alunos
+* Buscar alunos por nome ou ID
+* Selecionar trimestre
+* Lançar notas
+* Atualizar notas já cadastradas
 
 ---
 
-## Regras de Negócio
+## 👨‍🎓 Aluno
 
-### Cadastro de Usuários
+* Consultar boletim
+* Visualizar notas por matéria
+* Visualizar médias trimestrais
+* Visualizar média final
+* Consultar situação final
 
-- Cada usuário deve possuir um login único.
-- Não é permitido cadastrar logins duplicados.
+---
 
-### Cadastro de Professores
+# 🛠 Tecnologias Utilizadas
 
-- Deve possuir nome.
-- Deve possuir uma matéria válida.
-- Recebe login e senha de acesso.
+## Backend
 
-### Cadastro de Alunos
+* Python 3
+* Flask
+* MySQL
+* mysql-connector-python
+* bcrypt
 
-- Deve possuir nome.
-- Deve possuir idade válida.
-- Deve pertencer a uma turma.
-- Recebe login e senha de acesso.
+## Frontend
 
-### Lançamento de Notas
+* HTML5
+* CSS3
 
-- Cada matéria possui 3 trimestres.
-- Cada trimestre possui 3 notas.
-- As notas devem estar entre 0 e 10.
-- O professor só pode lançar notas da sua matéria.
+---
 
-### Média Trimestral
+# 🔐 Controle de Acesso
+
+| Cargo | Permissão                      |
+| ----- | ------------------------------ |
+| ADM   | Gerenciar alunos e professores |
+| PROF  | Lançar notas                   |
+| ALUNO | Consultar boletim              |
+
+---
+
+# 📚 Regras de Negócio
+
+## Usuários
+
+* Login único
+* Não permite duplicidade
+* Senhas armazenadas com Hash (bcrypt)
+
+## Professores
+
+* Nome obrigatório
+* Matéria válida
+* Login e senha obrigatórios
+
+## Alunos
+
+* Nome obrigatório
+* Idade válida
+* Turma obrigatória
+* Login e senha obrigatórios
+
+## Notas
+
+* 3 trimestres por matéria
+* 3 notas por trimestre
+* Notas entre **0 e 10**
+* Professor lança apenas notas da própria matéria
+
+---
+
+# 📐 Fórmulas
+
+## Média Trimestral
 
 ```text
 (nota1 + nota2 + nota3) / 3
 ```
 
-### Média Final
+## Média Final
 
 ```text
-(media_trimestre1 + media_trimestre2 + media_trimestre3) / 3
+(media1 + media2 + media3) / 3
 ```
 
-### Situação do Aluno
+## Situação Final
 
-- Média final ≥ 7 → Aprovado
-- Média final < 7 → Reprovado
+```text
+≥ 7 → Aprovado
+< 7 → Reprovado
+```
 
 ---
 
-##Estrutura do Banco de Dados
+# 🗄 Banco de Dados
 
-### Usuarios
+## usuarios
 
-| Campo | Tipo |
-|---------|---------|
-| id | INT |
-| login | VARCHAR(50) |
-| senha | VARCHAR(50) |
-| cargo | ENUM |
+| Campo | Tipo         |
+| ----- | ------------ |
+| id    | INT          |
+| login | VARCHAR(50)  |
+| senha | VARCHAR(255) |
+| cargo | ENUM         |
 
-### Professores
+## professores
 
-| Campo | Tipo |
-|---------|---------|
-| id | INT |
-| nome | VARCHAR(100) |
-| materia | VARCHAR(50) |
-| login | VARCHAR(50) |
+| Campo   | Tipo         |
+| ------- | ------------ |
+| id      | INT          |
+| nome    | VARCHAR(100) |
+| materia | VARCHAR(50)  |
+| login   | VARCHAR(50)  |
 
-### Alunos
+## alunos
 
-| Campo | Tipo |
-|---------|---------|
-| id | INT |
-| nome | VARCHAR(100) |
-| idade | INT |
-| turma | INT |
-| login | VARCHAR(50) |
+| Campo | Tipo         |
+| ----- | ------------ |
+| id    | INT          |
+| nome  | VARCHAR(100) |
+| idade | INT          |
+| turma | INT          |
+| login | VARCHAR(50)  |
 
-### Notas
+## notas
 
-| Campo | Tipo |
-|---------|---------|
-| id | INT |
-| aluno_id | INT |
-| materia | VARCHAR(30) |
-| trimestre | INT |
-| nota1 | DECIMAL(4,2) |
-| nota2 | DECIMAL(4,2) |
-| nota3 | DECIMAL(4,2) |
+| Campo           | Tipo         |
+| --------------- | ------------ |
+| id              | INT          |
+| aluno_id        | INT          |
+| materia         | VARCHAR(30)  |
+| trimestre       | INT          |
+| nota1           | DECIMAL(4,2) |
+| nota2           | DECIMAL(4,2) |
+| nota3           | DECIMAL(4,2) |
 | media_trimestre | DECIMAL(4,2) |
 
-### Medias_Finais
+## medias_finais
 
-| Campo | Tipo |
-|---------|---------|
-| id | INT |
-| aluno_id | INT |
-| materia | VARCHAR(30) |
+| Campo       | Tipo         |
+| ----------- | ------------ |
+| id          | INT          |
+| aluno_id    | INT          |
+| materia     | VARCHAR(30)  |
 | media_final | DECIMAL(4,2) |
-| situacao | VARCHAR(20) |
+| situacao    | VARCHAR(20)  |
 
 ---
 
-##F luxo do Sistema
+# 🔄 Fluxo do Sistema
 
-### Login
+```text
+Login
+ ↓
+Validação
+ ↓
 
-1. O usuário informa login e senha.
-2. O sistema valida as credenciais.
-3. O sistema identifica o cargo.
-4. O sistema redireciona para o menu correspondente.
+ADM
+├── Gerenciar Alunos
+└── Gerenciar Professores
 
-### Administrador
+PROF
+└── Lançar Notas
 
-1. Faz login.
-2. Escolhe administrar alunos ou professores.
-3. Realiza operações de cadastro, alteração, consulta e remoção.
-
-### Professor
-
-1. Faz login.
-2. Seleciona lançamento de notas.
-3. Escolhe um aluno.
-4. Seleciona o trimestre.
-5. Informa as notas.
-6. O sistema calcula e salva as médias.
-
-### Aluno
-
-1. Faz login.
-2. Acessa o boletim.
-3. Visualiza notas, médias e situação final.
+ALUNO
+└── Consultar Boletim
+```
 
 ---
 
-##Usuário Administrador Padrão
+# 📁 Estrutura do Projeto
+
+```text
+projeto/
+
+app.py
+database.py
+
+templates/
+├── login.html
+├── adm.html
+├── professor.html
+└── aluno.html
+
+static/
+├── css/
+└── img/
+
+alunos.py
+professor.py
+notas.py
+utils.py
+```
+
+---
+
+# 👤 Usuário Administrador Padrão
 
 ```text
 Login: admin
-Senha: 123
+Senha: admin123
 ```
 
 ---
 
-## Como Executar
+# 🚀 Como Executar
 
-### 1. Instalar Dependências
+## Instalar Dependências
 
 ```bash
+pip install flask
 pip install mysql-connector-python
-```
-```bash
 pip install bcrypt
 ```
 
-### 2. Criar o Banco de Dados
+## Configurar Banco
 
-Execute o script SQL fornecido no projeto.
+Execute o script SQL do projeto.
 
-### 3. Configurar a Conexão
-
-Configure a variável de ambiente:
+## Configurar Variável de Ambiente
 
 ```bash
 DB_PASSWORD=sua_senha
 ```
 
-ou altere diretamente o arquivo de conexão.
-
-### 4. Executar o Sistema
+## Executar
 
 ```bash
-python main.py
+python app.py
+```
+
+Acesse:
+
+```text
+http://127.0.0.1:5000
 ```
 
 ---
 
-##Autores
+# 👥 Autores
 
-Projeto acadêmico desenvolvido utilizando Python e MySQL para gerenciamento de alunos, professores, notas e boletins escolares.
+Projeto acadêmico desenvolvido utilizando:
+
+* Flask
+* Python
+* HTML
+* CSS
+* MySQL
