@@ -3,7 +3,7 @@ import bcrypt
 from database import criar_conexao
 from utils import verificar_login_existente
 
-
+#cadastro do aluno
 def cadastrar_aluno():
 
     while True:
@@ -104,7 +104,7 @@ def cadastrar_aluno():
                 cursor.close()
                 conn.close()
 
-
+#listagem dos alunos
 def listar_alunos():
 
     print("\n--- Lista de Alunos ---")
@@ -154,7 +154,7 @@ def listar_alunos():
             cursor.close()
             conn.close()
 
-
+#remoção do aluno
 def remover_aluno():
 
     print("\n--- Remover aluno ---")
@@ -246,7 +246,7 @@ def remover_aluno():
             cursor.close()
             conn.close()
 
-
+#alteração da turma do aluno
 def alterar_turma_aluno():
 
     if not listar_alunos():
