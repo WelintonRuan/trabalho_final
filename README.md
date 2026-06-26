@@ -1,3 +1,4 @@
+
 # 🎓 Sistema Escolar Web
 
 Sistema desenvolvido em **Python + Flask + MySQL** para gerenciamento escolar.
@@ -169,12 +170,16 @@ Permite controle de acesso por perfil (**Administrador, Professor e Aluno**), ge
 ## medias_finais
 
 | Campo       | Tipo         |
+
 | ----------- | ------------ |
 | id          | INT          |
 | aluno_id    | INT          |
 | materia     | VARCHAR(30)  |
 | media_final | DECIMAL(4,2) |
 | situacao    | VARCHAR(20)  |
+
+
+<img width="828" height="702" alt="imagem (1)" src="https://github.com/user-attachments/assets/76f7d348-6ea9-4e4b-9295-933536c00cf1" />
 
 ---
 
@@ -196,6 +201,7 @@ PROF
 ALUNO
 └── Consultar Boletim
 ```
+
 
 ---
 
@@ -222,7 +228,7 @@ professor.py
 notas.py
 utils.py
 ```
-
+<img width="942" height="805" alt="imagem" src="https://github.com/user-attachments/assets/89ec7e7c-bba9-4687-a305-41a2a8d030fb" />
 ---
 
 # 👤 Usuário Administrador Padrão
