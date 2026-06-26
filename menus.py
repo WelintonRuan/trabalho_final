@@ -19,7 +19,7 @@ from professor import (
 from notas import lancar_notas, ver_boletim
 from database import criar_conexao
 
-
+#entrada do usuário
 def login():
 
     print("\n========= LOGIN =========")
@@ -81,7 +81,7 @@ def login():
         cursor.close()
         conn.close()
 
-
+#fazer o login
 def menu_login():
 
     while True:
