@@ -5,7 +5,7 @@ from alunos import buscar_aluno, listar_alunos
 from database import criar_conexao
 from professor import buscar_materia_professor
 
-
+#cálculo da média trimestral 
 def calcular_media_trimestre(n1, n2, n3):
     return round((n1 + n2 + n3) / 3, 2)
 
@@ -83,7 +83,7 @@ def calcular_media_final(aluno_id, materia):
         conn.close()
 
 
-
+#lançamento das notas
 def lancar_notas(usuario):
 
     materia = buscar_materia_professor(usuario)
@@ -244,7 +244,7 @@ def lancar_notas(usuario):
         print("Digite apenas números.")
 
 
-
+#visualização do boletim 
 def ver_boletim(usuario):
 
     conn = criar_conexao()
