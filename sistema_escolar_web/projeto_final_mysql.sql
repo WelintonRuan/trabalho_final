@@ -6,7 +6,7 @@ USE escola;
 #USUÁRIOS
 
 
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     login VARCHAR(50) UNIQUE NOT NULL,
     senha VARCHAR(255) NOT NULL,
@@ -16,7 +16,7 @@ CREATE TABLE usuarios (
 
 #PROFESSORES
 
-CREATE TABLE professores (
+CREATE TABLE IF NOT EXISTS professores (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     materia VARCHAR(50) NOT NULL,
@@ -27,7 +27,7 @@ CREATE TABLE professores (
 #ALUNOS
 
 
-CREATE TABLE alunos (
+CREATE TABLE IF NOT EXISTS alunos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
     idade INT NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE alunos (
 #NOTAS POR TRIMESTRE
 
 
-CREATE TABLE notas (
+CREATE TABLE IF NOT EXISTS notas (
 
     id INT AUTO_INCREMENT PRIMARY KEY,
 
@@ -55,7 +55,7 @@ CREATE TABLE notas (
 
     media_trimestre DECIMAL(4,2),
 
-    CONSTRAINT fk_notas_aluno
+    CONSTRAINT  fk_notas_aluno
         FOREIGN KEY (aluno_id)
         REFERENCES alunos(id)
         ON DELETE CASCADE,
@@ -68,7 +68,7 @@ CREATE TABLE notas (
 #MÉDIAS FINAIS
 
 
-CREATE TABLE medias_finais (
+CREATE TABLE IF NOT EXISTS medias_finais (
 
     id INT AUTO_INCREMENT PRIMARY KEY,
 
@@ -94,4 +94,4 @@ CREATE TABLE medias_finais (
 
 
 INSERT INTO usuarios (login, senha, cargo)
-VALUES ('admin', '$2b$12$evelF1nM4yAFM5H64t8G0.3cWhXSsRpous5X2XTA/0XifAqACtQjm', 'ADM');
+VALUES ('admin', '*Coloque o hash que você gerou em (gerar_hash.py)', 'ADM');
